@@ -18,80 +18,39 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE,
 ```{r prep, message=FALSE, warning=FALSE}
 ## packages
 library(tidyverse)
-#library(gghighlight)
 library(janitor)
-#library(treemapify)
 library(ggwordcloud)
-## ggplot theme updates
-#source(here::here("R", "tidy_grey.R"))
 ```
 
 ```{r data}
 tuesdata <- tidytuesdayR::tt_load(2022, week = 23)
-
-
 ```
 
 ```{r data-calculations}
 static_list <- tuesdata$static_list %>%
   clean_names() %>%
   filter(company != "Grand Total") %>%
-  arrange(desc(amount_contributed_across_states)) %>% 
-  mutate(pride = case_when(pride ~ "Pride Sponsor",
-                            TRUE ~ "Non Sponsor"),
-         hrc_business_pledge = 
-           case_when(hrc_business_pledge ~ "HRC Business Pledge",
-                     TRUE ~ "No Pledge"),
-         pride = factor(pride, levels = c("Pride Sponsor", "Non Sponsor")),
-         hrc_business_pledge = factor(hrc_business_pledge,
-                                      levels = c("HRC Business Pledge",
-                                                 "No Pledge"))
-         )
+  filter(pride) 
 ```
 
-```{r chart}
-colouring <- tibble(
-  pride = c("Pride Sponsor", "Pride Sponsor", "Non Sponsor", "Non Sponsor"),
-  hrc_business_pledge = c("HRC Business Pledge", "No Pledge", "HRC Business Pledge", "No Pledge"),
-  col = c("red", "darkred", "darkred", "gray50"),
-  amount_contributed_across_states = c(1,1,1,1),
-  company = c("a", "a", "a", "a")
-) %>% 
-  mutate(pride = factor(pride, levels = c("Pride Sponsor", "Non Sponsor")),
-         hrc_business_pledge = factor(hrc_business_pledge,
-                                      levels = c("HRC Business Pledge",
-                                                 "No Pledge")))
+```{r}
+sum(static_list$amount_contributed_across_states)
+```
+
+
+```{r cloud}
+ttl <- toupper("Pride sponsors that have contributed to anti-LGBTQ+ campaigns")
 
 static_list %>% 
   ggplot(aes(label = company, size = amount_contributed_across_states)) +
-  geom_rect(data = filter(colouring, pride == "Pride Sponsor",
-                          hrc_business_pledge == "HRC Business Pledge"),
-            aes(fill = col),
-            xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = .3,
-            show.legend = FALSE) +
-    geom_rect(data = filter(colouring, pride == "Non Sponsor",
-                          hrc_business_pledge == "HRC Business Pledge"),
-            aes(fill = col),
-            xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = .3,
-            show.legend = FALSE) +
-      geom_rect(data = filter(colouring, pride == "Pride Sponsor",
-                          hrc_business_pledge == "No Pledge"),
-            aes(fill = col),
-            xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = .3,
-            show.legend = FALSE) +
-      geom_rect(data = filter(colouring, pride == "Non Sponsor",
-                          hrc_business_pledge == "No Pledge"),
-            aes(fill = col),
-            xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf, alpha = .3,
-            show.legend = FALSE) +
-  geom_text_wordcloud_area() +
-  scale_size_area(max_size = 30) +
-  facet_grid(rows = vars(hrc_business_pledge),
-             cols = vars(pride)) +
-  labs(title = "Toyota and AT&T are massive fuckers",
-       subtitle = "Corporate donors to anti-LGBQT+ politicians") +
+  geom_text_wordcloud_area(color = "red") +
+  scale_size_area(max_size = 45) +
+  scale_color_manual(values = "white") +
+  labs(title = ttl,
+       caption = "Source: Data For Progress / Pride Corporate Accountability Project") +
   theme_minimal() +
-  theme(plot.title.position = "plot")
+  theme(plot.title = element_text(hjust = 0.5, size = 18, face = "bold"),
+        text = element_text(family = "mono"))
 
 ggsave(here::here("plots", "2022-23", "2022_23_Price_Corporate.pdf"),
        width = 10, height = 8, device = cairo_pdf)
