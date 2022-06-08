@@ -20,6 +20,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE,
 library(tidyverse)
 library(janitor)
 library(ggwordcloud)
+library(patchwork)
 ```
 
 ```{r data}
@@ -41,7 +42,7 @@ sum(static_list$amount_contributed_across_states)
 ```{r cloud}
 ttl <- toupper("Pride sponsors that have contributed to anti-LGBTQ+ campaigns")
 
-static_list %>% 
+chart <- static_list %>% 
   ggplot(aes(label = company, size = amount_contributed_across_states)) +
   geom_text_wordcloud_area(color = "red") +
   scale_size_area(max_size = 45) +
@@ -51,9 +52,16 @@ static_list %>%
   theme_minimal() +
   theme(plot.title = element_text(hjust = 0.5, size = 18, face = "bold"),
         text = element_text(family = "mono"))
+```
 
-ggsave(here::here("plots", "2022-23", "2022_23_Price_Corporate.pdf"),
+```{r full-panel, fig.width = 10, fig.height = 8}
+chart + plot_layout(ncol = 1)
+
+ggsave(here::here("plots", "2022-23", "2022_23_Pride_Corporate.pdf"),
        width = 10, height = 8, device = cairo_pdf)
+
+ggsave(here::here("plots", "2022-23", "2022_23_Pride_Corporate.png"),
+       width = 10, height = 8, device = "png")
 ```
 
 ***
