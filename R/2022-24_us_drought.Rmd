@@ -1,0 +1,137 @@
+---
+title: "TidyTuesday 2022-24 - US Drought by Drought.gov"
+author: "Martijn van Bloois"
+date: "2022-06-14"
+output:
+  html_document:
+  theme: paper
+highlight: kate
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE,
+                      dev = "cairo_pdf")
+```
+
+```{r prep, message=FALSE, warning=FALSE}
+## packages
+library(tidyverse)
+library(janitor)
+library(geofacet)
+library(lubridate)
+library(scales)
+library(ggtext)
+library(patchwork)
+```
+
+```{r data-load}
+drought <- 
+  read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-06-14/drought.csv')
+drought_fips <- 
+  read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-06-14/drought-fips.csv')
+```
+
+```{r data-prep}
+drought_tbl <- drought %>% 
+  clean_names() %>% 
+  mutate(date = str_remove(date, "^d_"),
+         date = as.Date(date, format = "%Y%m%d"),
+         state = str_replace(state, "-", " "),
+         state = str_to_title(state),
+         state_abb = state.abb[match(state, state.name)],
+         state_area = state.area[match(state, state.name)],
+         state_region = state.division[match(state, state.name)])
+
+drought_fips_tbl <- drought_fips %>% 
+  clean_names()
+
+div_area <- tibble(
+  state_region = state.division[c(-2,-11)],
+  area = state.area[c(-2,-11)]
+) %>% 
+  group_by(state_region) %>% 
+  summarise(area = sum(area))
+```
+
+```{r}
+cusa_area <- sum(state.area[c(-2,-11)])
+
+title <- "After 2000: severe wetness occurs more on average than extreme drought"
+caption <- "Square miles affected by <span style='color:#a52208;'>draught</span> or <span style='color:#09377c;'>wetness</span>"
+
+plt_1 <- drought_tbl %>%
+  filter(date >= "1900-01-01") %>% 
+  mutate(drought_area = d0 / 100 * state_area,
+         wet_area = w0 / 100 * state_area) %>% 
+  group_by(date, state_region) %>% 
+  summarise(total_drought_area = sum(drought_area),
+            total_wet_area = sum(wet_area)) %>% 
+  ggplot() +
+  geom_point(aes(x = date, y = total_drought_area), alpha = 0.1, colour = "#a52208") +
+  geom_smooth(aes(x = date, y = total_drought_area), colour = "#a52208") +
+  geom_point(aes(x = date, y = total_wet_area), alpha = 0.1, colour = "#09377c") +
+  geom_smooth(aes(x = date, y = total_wet_area), colour = "#09377c") +
+  geom_hline(data = div_area, aes(yintercept = area, linetype = "-"),
+             alpha = 0.1, show.legend = FALSE) +
+  scale_y_continuous(labels = number_format(scale = 0.001)) +
+  facet_wrap(~state_region, scales = "free_y") +
+  labs(title = title,
+       subtitle = caption,
+       x = NULL, y = "square miles (thousands)") +
+  theme_minimal() +
+  theme(plot.title = element_markdown(size = 13),
+        plot.subtitle = element_markdown(size = 11),
+        plot.title.position = "plot")
+
+plt_1
+```
+
+
+```{r, eval = F}
+my_us_grid <- us_state_without_DC_grid3[c(-1, -50), ]
+
+p1 <- drought_tbl %>% 
+  filter(date >= "2000-01-01") %>% 
+  #filter(str_detect(state, "^A")) %>% 
+  ggplot() +
+  geom_area(aes(x = date, y = d0), fill = "#d2d827") +
+  geom_area(aes(x = date, y = d1), fill = "orange") +
+  geom_area(aes(x = date, y = d2), fill = "#c66b09") +
+  geom_area(aes(x = date, y = d3), fill = "#c62909") +
+  geom_area(aes(x = date, y = d4), fill = "#a52208") +
+  geom_area(aes(x = date, y = -w0), fill = "#8fb6ef") +
+  geom_area(aes(x = date, y = -w1), fill = "#4479c9") +
+  geom_area(aes(x = date, y = -w2), fill = "#2d61af") +
+  geom_area(aes(x = date, y = -w3), fill = "#174993") +
+  geom_area(aes(x = date, y = -w4), fill = "#09377c") +
+  scale_y_continuous(limits = c(-100,100)) +
+  labs(x = NULL, y = NULL) +
+  theme_minimal()
+
+plt_2 <- p1 + facet_geo(~ state_abb, grid = my_us_grid, scales = "fixed") +
+  theme(axis.text = element_text(colour = "white"))
+
+```
+
+
+```{r cloud}
+
+```
+
+```{r full-panel, fig.width = 10, fig.height = 8}
+plt_1 + plot_layout(ncol = 1)
+ 
+ggsave(here::here("plots", "2022-24", "2022_24_US_Drought.pdf"),
+      width = 10, height = 8, device = cairo_pdf)
+ 
+ggsave(here::here("plots", "2022-24", "2022_24_US_Drought.png"),
+      width = 10, height = 8, device = "png")
+```
+
+***
+
+```{r session-info}
+sessionInfo()
+```
