@@ -55,7 +55,6 @@ firsts %>%
   count(category)
 
 firsts_tbl <- firsts %>%
-  #filter(category != "Arts & Entertainment") %>%
   filter(year > 1799) %>% 
   filter(year < 1900) %>% 
   mutate(person = str_replace_all(person, "\\[[0-9]+\\]", ""),
@@ -65,11 +64,13 @@ firsts_tbl <- firsts %>%
          person = str_remove(person, ", who was educated at the University.+$"),
          person = str_remove(person, ", based in Philadelphia.+$"),
          person = str_remove(person, " founded in Philadelphia.+$"),
-         person = str_remove(person, ", Belgium.$"),
+         person = str_remove(person, ", Belgium.+$"),
          person = str_remove(person, ", The Laughing.+$"),
          person = str_remove(person, ", hired by.+$"),
          person = str_remove(person, " His opponent contested.+$"),
+         person = str_remove(person, ", then living.+$"),
          person = str_remove(person, "; Xenia.+$"),
+         person = str_remove(person, "founded in New York City by "),
          person = str_replace_all(person, " \\(.+\\)", ""),
          person = str_remove(person, "\\.$"),
          accomplishment = str_remove(accomplishment, "First African-American"),
@@ -98,7 +99,8 @@ fill_cols <- c(
   "Military" = green,
   "Politics" = black,
   "Social & Jobs" = pink,
-  "Sports" = gold
+  "Sports" = gold,
+  "Arts & Entertainment" = tan
 )
 
 subtitle <- "FIRST AFRICAN-AMERICAN ..."
@@ -154,7 +156,7 @@ plt_1 <-
     axis.text = element_blank(),
     axis.line = element_blank(),
     panel.grid = element_blank(),
-    plot.background = element_rect(fill = tan),
+    plot.background = element_rect(fill = "#ede5dc"),
     legend.position = "bottom"
   )
 ```
