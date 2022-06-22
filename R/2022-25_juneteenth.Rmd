@@ -55,18 +55,28 @@ firsts %>%
   count(category)
 
 firsts_tbl <- firsts %>%
-  filter(category != "Arts & Entertainment") %>%
+  #filter(category != "Arts & Entertainment") %>%
   filter(year > 1799) %>% 
   filter(year < 1900) %>% 
   mutate(person = str_replace_all(person, "\\[[0-9]+\\]", ""),
+         person = str_replace_all(person, "\\[Note [0-9]+\\]", ""),
          person = str_remove(person, " \\(See also"),
+         person = str_remove(person, ", renamed Lincoln University.+$"),
+         person = str_remove(person, ", who was educated at the University.+$"),
+         person = str_remove(person, ", based in Philadelphia.+$"),
+         person = str_remove(person, " founded in Philadelphia.+$"),
+         person = str_remove(person, ", Belgium.$"),
+         person = str_remove(person, ", The Laughing.+$"),
+         person = str_remove(person, ", hired by.+$"),
+         person = str_remove(person, " His opponent contested.+$"),
+         person = str_remove(person, "; Xenia.+$"),
          person = str_replace_all(person, " \\(.+\\)", ""),
+         person = str_remove(person, "\\.$"),
          accomplishment = str_remove(accomplishment, "First African-American"),
          accomplishment = str_remove(accomplishment, "^First "),
          accomplishment = str_remove(accomplishment, "African-American "),
          accomplishment = str_replace(accomplishment, "woman", "female")
          ) %>% 
-  mutate(label = paste(accomplishment, person)) %>% 
   group_by(year) %>% 
   sample_n(1)
 ```
@@ -81,51 +91,72 @@ crimson <-  	"#dc143c"
 green <- 	 	"#00aa00"
 blue 	<-  	"#4682b4"
 
-fill_cols <- c("Religion" = crimson,
-               "Education & Science" = brown,
-               "Law" = blue,
-               "Military" = green,
-               "Politics" = black,
-               "Social & Jobs" = pink,
-               "Sports" = gold)
+fill_cols <- c(
+  "Religion" = crimson,
+  "Education & Science" = brown,
+  "Law" = blue,
+  "Military" = green,
+  "Politics" = black,
+  "Social & Jobs" = pink,
+  "Sports" = gold
+)
 
-subtitle <- str_to_upper(
-  "First African-American ..."
-    )
-title <- "Major African-American accomplishments in the nineteenth century"
-caption <- "Source:"
+subtitle <- "FIRST AFRICAN-AMERICAN ..."
+title <-
+  "African-American accomplishments in the nineteenth century"
+caption <- "Source: adapted from Wikipedia"
 
-plt_1 <- 
-  firsts_tbl %>% 
+plt_1 <-
+  firsts_tbl %>%
   ggplot() +
   geom_hline(aes(yintercept = 0), linetype = 2) +
-  geom_label(aes(x = year, y = 0, label = year, fill = category),
-             color = "white",
-             label.r = unit(0.5, "lines"),
-             ) +
+  geom_label(
+    aes(
+      x = year,
+      y = 0,
+      label = year,
+      fill = category
+    ),
+    color = "white",
+    label.r = unit(0.5, "lines"),
+  ) +
   scale_fill_manual(values = fill_cols) +
   geom_text(aes(x = year, y = .5, label = person),
             hjust = "left",
             size = 4) +
   geom_text(aes(x = year, y = -.5, label = accomplishment),
-           hjust = "right",
-           size = 4) +
+            hjust = "right",
+            size = 4) +
   scale_x_reverse() +
-  scale_y_continuous(limits = c(-5,5)) +
-  labs(title = title,
-       subtitle = subtitle,
-       caption = caption,
-       x = NULL, y = NULL) +
+  scale_y_continuous(limits = c(-5, 5)) +
+  labs(
+    title = title,
+    subtitle = subtitle,
+    caption = caption,
+    x = NULL,
+    y = NULL
+  ) +
   coord_flip() +
   theme_minimal() +
-  theme(text = element_text(family = "ibm-plex-sans"),
-        plot.title = element_markdown(size = 20, hjust = 0.5),
-        plot.subtitle = element_markdown(size = 28, hjust = 0.5),
-        axis.text = element_blank(),
-        axis.line = element_blank(),
-        panel.grid = element_blank(),
-        plot.background = element_rect(fill = tan),
-        legend.position = "bottom")
+  theme(
+    text = element_text(family = "ibm-plex-sans"),
+    plot.title = element_text(
+      family = "ibm-plex-sans",
+      size = 20,
+      hjust = 0.5
+    ),
+    plot.subtitle = element_text(
+      family = "ibm-plex-sans",
+      face = "bold",
+      size = 28,
+      hjust = 0.5
+    ),
+    axis.text = element_blank(),
+    axis.line = element_blank(),
+    panel.grid = element_blank(),
+    plot.background = element_rect(fill = tan),
+    legend.position = "bottom"
+  )
 ```
 
 ```{r full-panel, fig.width = 12, fig.height = 20}
