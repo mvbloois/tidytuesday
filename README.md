@@ -9,7 +9,7 @@ My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosyste
 
 [Rendered code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-25_juneteenth.html)
 
-![./plots/2022-25/2022_25_juneteenth.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/plots/2022-25/2022_25_juneteenth.png)
+![./plots/2022-25/2022_25_Juneteenth.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/plots/2022-25/2022_25_Juneteenth.png)
 
 ### [2022-24](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-24) ☀️ 🌧️ US Drought by [Drought.gov](https://www.drought.gov)
 
