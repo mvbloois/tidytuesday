@@ -1,0 +1,100 @@
+---
+title: "TidyTuesday 2022-26 - UK Gender Pay Gap by gender-pay-gap.service.gov.uk"
+author: "Martijn van Bloois"
+date: "`r sys.Date()"
+output:
+  html_document:
+  theme: paper
+highlight: kate
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE,
+                      dev = "cairo_pdf")
+```
+
+```{r prep, message=FALSE, warning=FALSE}
+## packages
+library(tidyverse)
+library(janitor)
+library(scales)
+library(ggtext)
+library(patchwork)
+library(showtext)
+font_add_google(name = "Open Sans", family = "open-sans")
+showtext_opts(dpi = 300)
+showtext_auto(enable = TRUE)
+```
+
+```{r this-week}
+topic <- "UK-Gender-Pay-Gap"
+year <- lubridate::year(Sys.Date())
+week <- lubridate::week(Sys.Date())
+yrwk <- glue::glue("{year}-{week}")
+plots_dir <- paste0("./plots/", year, "-", week)
+fs::dir_create(plots_dir)
+png_file <- glue::glue("{yrwk}_{topic}.png")
+pdf_file <- glue::glue("{yrwk}_{topic}.pdf")
+```
+
+```{r data-load}
+tuesdata <- tidytuesdayR::tt_load(year, week = week)
+```
+
+```{r data-prep}
+
+```
+
+```{r plotting}
+# red: #c22419
+# blue: #192dc2
+# darkblue: #0c1454
+# yellow: #f0dd90
+# darkyellow: #e3c139
+
+title <- str_to_upper(
+  "**Increase in extreme wet conditions in eastern USA since 2000**"
+    )drought_tbl %>%
+  filter(date >= "1900-01-01") %>% 
+subtitle <- "Area affected by <span style='color:#c22419;'>drought</span> or <span style='color:#192dc2;'>wet</span> conditions since 1900"
+caption <- "Source: National Integrated Drought Information System"
+
+plt_1 <- data_tbl %>% 
+  ggplot() +
+
+  
+  labs(title = title,
+       subtitle = subtitle,
+       caption = caption,
+       x = NULL, y = NULL) +
+  theme_minimal() +
+  theme(text = element_text(family = "open-sans", color = "#0c1454"),
+        plot.title = element_markdown(size = 19, hjust = 0.5),
+        plot.subtitle = element_markdown(size = 15, hjust = 0.5,
+                                         color = "#0c1454"),
+        plot.title.position = "plot",
+        plot.background = element_rect(fill = "#ede0ad"),
+        panel.grid = element_line(colour = "#e3c139"),
+        axis.text = element_text(color = "#0c1454", size = 10),
+        strip.text = element_text(color = "#0c1454", size = 11))
+```
+
+```{r full-panel, fig.width = 10, fig.height = 8}
+plt_1 + plot_layout(ncol = 1)
+
+ggsave(here::here("plots", yrwk, pdf_file),
+      width = 10, height = 8, dpi = 300,
+      device = cairo_pdf)
+
+ggsave(here::here("plots", yrwk, png_file),
+      width = 10, height = 8, dpi = 300,
+      device = "png")
+```
+
+***
+
+```{r session-info}
+sessionInfo()
+```
