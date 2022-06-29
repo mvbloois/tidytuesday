@@ -15,70 +15,180 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE,
                       dev = "cairo_pdf")
 ```
 
-```{r prep, message=FALSE, warning=FALSE}
-## packages
-library(tidyverse)
-library(janitor)
-library(scales)
-library(ggtext)
-library(patchwork)
-library(showtext)
-font_add_google(name = "Open Sans", family = "open-sans")
-showtext_opts(dpi = 300)
-showtext_auto(enable = TRUE)
-```
-
 ```{r this-week}
 topic <- "UK-Gender-Pay-Gap"
 year <- lubridate::year(Sys.Date())
 week <- lubridate::week(Sys.Date())
 yrwk <- glue::glue("{year}-{week}")
-plots_dir <- paste0("./plots/", year, "-", week)
-fs::dir_create(plots_dir)
+plots_dir <- paste0(year, "-", week)
+fs::dir_create(here::here("plots", plots_dir))
 png_file <- glue::glue("{yrwk}_{topic}.png")
 pdf_file <- glue::glue("{yrwk}_{topic}.pdf")
 ```
 
-```{r data-load}
-tuesdata <- tidytuesdayR::tt_load(year, week = week)
+```{r prep, message=FALSE, warning=FALSE}
+## packages
+library(tidyverse)
+library(janitor)
+library(lubridate)
+library(scales)
+library(ggtext)
+library(glue)
+library(patchwork)
+library(showtext)
+font_add_google(name = "Libre Baskerville", family = "baskerville")
+showtext_opts(dpi = 300)
+showtext_auto(enable = TRUE)
 ```
 
-```{r data-prep}
 
+```{r, eval=FALSE}
+pc <- readr::read_csv("https://opendata.camden.gov.uk/api/views/tr8t-gqz7/rows.csv")
+
+pc %>% 
+  clean_names() %>% 
+  separate(postcode_3, c("pc3", "second")) %>% 
+  distinct(pc3, region_name) %>% 
+  mutate(region_name = str_remove(region_name, "\\(pseudo\\) ")) %>% 
+  write_rds("./R/data/pc3_region.rds")
+```
+
+
+```{r data-load}
+tuesdata <- tidytuesdayR::tt_load(year, week = week)
+paygap <- tuesdata$paygap %>% 
+  group_by(employer_id, year = year(date_submitted)) %>% 
+  filter(date_submitted == max(date_submitted)) %>% 
+  ungroup()
+
+regions <- read_rds(here::here("R", "data", "pc3_region.rds"))
+```
+
+
+
+
+```{r data-prep}
+data_tbl <- paygap %>% 
+  mutate(pc3 = str_extract(post_code, "^[:alnum:]+")) %>% 
+  inner_join(regions, by = "pc3") %>% 
+  mutate(year = year(due_date)) %>% 
+  filter(year < 2023)
+
+paygap_regional <- data_tbl %>% 
+  filter(year == 2018 | year == 2022) %>% 
+  group_by(region_name, year) %>% 
+  summarise(median = median(diff_median_hourly_percent)) %>% 
+  group_by(region_name) %>% 
+  mutate(line_col = as.character(year[median == max(median)])) %>% 
+  ungroup()
+
+levels <- paygap_regional %>% 
+  filter(year == 2022) %>% 
+  arrange(median) %>% 
+  pull(region_name)
+
+paygap_regional <- paygap_regional %>% 
+  mutate(region_name = factor(region_name, levels),
+         region_rnk = as.numeric(region_name))
+
+paygap_national <- data_tbl %>% 
+  filter(year == 2018 | year == 2022) %>% 
+  group_by(year) %>% 
+  summarise(median = median(diff_median_hourly_percent),
+            .groups = "drop")
+
+minimum <- min(paygap_national$median)
+maximum <- max(paygap_national$median)
+
+lbl_nat_min <- glue("Median Pay Gap in 2018: +{minimum}%")
+lbl_nat_max <- glue("Median Pay Gap in 2022: +{maximum}%")
 ```
 
 ```{r plotting}
-# red: #c22419
-# blue: #192dc2
+colours <- c(`2022` = "#C8102E",
+   `2018` = "#f57d90")
+
+blue <- "#012169"
+green <- "#006400"
 # darkblue: #0c1454
 # yellow: #f0dd90
 # darkyellow: #e3c139
 
-title <- str_to_upper(
-  "**Increase in extreme wet conditions in eastern USA since 2000**"
-    )drought_tbl %>%
-  filter(date >= "1900-01-01") %>% 
-subtitle <- "Area affected by <span style='color:#c22419;'>drought</span> or <span style='color:#192dc2;'>wet</span> conditions since 1900"
-caption <- "Source: National Integrated Drought Information System"
+title <- "GENDER   PAY   GAP   WIDENS"
+subtitle <- "in most regions between <span style='color:#f57d90;'>2018</span> and <span style='color:#C8102E;'>2022</span>"
+caption <- "Source: gender-pay-gap.service.gov.uk"
 
-plt_1 <- data_tbl %>% 
-  ggplot() +
-
-  
+plt_1 <- ggplot(paygap_regional, aes(x = median, y = region_rnk)) +
+  geom_vline(data = paygap_national,
+             aes(xintercept = median, colour = factor(year)),
+             linetype = 2,
+             show.legend = FALSE) +
+  geom_vline(aes(xintercept = 0), colour = green, linetype = 2, size = 1.2) +
+  geom_label(aes(x = 0, y = 12, label = "Equal Pay"),
+             colour = green,
+             family = "baskerville",
+             fontface = "italic",
+             fill = "#eff2f7") +
+  geom_label(aes(x = minimum - 3.7, y = 0, label = lbl_nat_min),
+             colour = "#f57d90",
+             family = "baskerville",
+             fontface = "italic",
+             fill = "#eff2f7") +
+  geom_label(aes(x = maximum + 3.7, y = 0, label = lbl_nat_max),
+             colour = "#C8102E",
+             family = "baskerville",
+             fontface = "italic",
+             fill = "#eff2f7") +
+  geom_line(aes(group = region_rnk, colour = line_col), size = 1.5,
+            show.legend = FALSE) + 
+  geom_point(aes(colour = factor(year)), size = 4,
+             show.legend = FALSE) +
+  geom_label(data = paygap_regional %>% group_by(region_name) %>%
+              filter(median == min(median)) %>%
+              filter(median < minimum),
+            aes(x = median - 0.5, y = region_rnk,
+            label = region_name), hjust = "right",
+            family = "baskerville", colour = blue, size = 8,
+            fill = "#eff2f7", label.size = NA) +
+  geom_label(data = paygap_regional %>% group_by(region_name) %>%
+              filter(median == max(median)) %>%
+              filter(median > maximum + 1),
+            aes(x = median + 0.5, y = region_rnk,
+            label = region_name), hjust = "left",
+            family = "baskerville", colour = blue, size = 8,
+            fill = "#eff2f7", label.size = NA) +
+  scale_x_continuous(
+    limits = c(-5, NA),
+    labels = number_format(suffix = "%", style_positive = "plus"),
+    expand = expansion(add = c(0,5))
+    ) +
+  scale_colour_manual(values = colours) +
   labs(title = title,
        subtitle = subtitle,
        caption = caption,
        x = NULL, y = NULL) +
   theme_minimal() +
-  theme(text = element_text(family = "open-sans", color = "#0c1454"),
-        plot.title = element_markdown(size = 19, hjust = 0.5),
-        plot.subtitle = element_markdown(size = 15, hjust = 0.5,
-                                         color = "#0c1454"),
+  theme(text = element_text(family = "baskerville"),
+        axis.text = element_text(colour = blue, size = 15),
         plot.title.position = "plot",
-        plot.background = element_rect(fill = "#ede0ad"),
-        panel.grid = element_line(colour = "#e3c139"),
-        axis.text = element_text(color = "#0c1454", size = 10),
-        strip.text = element_text(color = "#0c1454", size = 11))
+        plot.title = element_markdown(colour = blue,
+                                      face = "bold",
+                                      size = 28,
+                                      hjust = 0.5,
+                                      vjust = 3.5),
+        plot.subtitle = element_markdown(colour = blue,
+                                         size = 24,
+                                         hjust = 0.5,
+                                         vjust = 3.5),
+        plot.caption = element_text(colour = blue,
+                                    size = 12,
+                                    vjust = -5),
+        axis.text.y = element_blank(),
+        axis.text.x = element_text(vjust = -3),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor.y = element_blank(),
+        plot.margin = unit(c(1, 2, 1, 2), "cm"),
+        plot.background = element_rect(fill = "#eff2f7"))
 ```
 
 ```{r full-panel, fig.width = 10, fig.height = 8}
