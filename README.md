@@ -4,6 +4,14 @@ My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosyste
 
 ***
 
+### [2022-26](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-26)
+
+🪙 👫 💷 [UK Gender Pay Gap](gender-pay-gap.service.gov.uk)
+
+[Rendered code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-26_UK-Gender-Pay-Gap.html)
+
+![./plots/2022-26/2022-26_UK-Gender-Pay-Gap.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/plots/2022-26/2022-26_UK-Gender-Pay-Gap.png)
+
 ### [2022-25](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-25)
 🥇 [Juneteenth](https://isabella-b.com/blog/juneteenth-2020/)
 
