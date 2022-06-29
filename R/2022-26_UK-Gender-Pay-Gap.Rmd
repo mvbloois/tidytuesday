@@ -109,7 +109,7 @@ colours <- c(`2022` = "#C8102E",
    `2018` = "#f57d90")
 
 blue <- "#012169"
-green <- "#006400"
+green <- "#00B140"
 # darkblue: #0c1454
 # yellow: #f0dd90
 # darkyellow: #e3c139
