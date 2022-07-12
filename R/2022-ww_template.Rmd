@@ -1,5 +1,5 @@
 ---
-title: "TidyTuesday 2022-24 -  by "
+title: "TidyTuesday 2022-27 - San Francisco Rentals by Kate Pennington"
 author: "Martijn van Bloois"
 date: "`r sys.Date()"
 output:
@@ -20,6 +20,7 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE,
 library(tidyverse)
 library(janitor)
 library(scales)
+library(lubridate)
 library(ggtext)
 library(patchwork)
 library(showtext)
@@ -28,12 +29,39 @@ showtext_opts(dpi = 300)
 showtext_auto(enable = TRUE)
 ```
 
+```{r this-week}
+topic <- "San-Francisco-Rentals"
+year <- 2022 # lubridate::year(Sys.Date())
+week <- 27 #lubridate::week(Sys.Date())
+yrwk <- glue::glue("{year}-{week}")
+plots_dir <- paste0(year, "-", week)
+fs::dir_create(here::here("plots", plots_dir))
+png_file <- glue::glue("{yrwk}_{topic}.png")
+pdf_file <- glue::glue("{yrwk}_{topic}.pdf")
+```
+
+
 ```{r data-load}
+rent <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-07-05/rent.csv')
+permits <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-07-05/sf_permits.csv')
+new_construction <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-07-05/new_construction.csv')
 
 ```
 
 ```{r data-prep}
+rent_mean_price_tbl <- rent %>% 
+  filter(city == "san francisco") %>% 
+  group_by(year) %>% 
+  summarise(mean_price = mean(price, na.rm = TRUE))
 
+
+permits_clean_tbl <- permits %>% 
+  filter(status == "complete") %>% 
+  mutate(lat = parse_number(word(location, 2)),
+         lng = parse_number(word(location, 3)),
+         completed_year = year(completed_date)) %>%
+  select(proposed_use, completed_year, lat, lng) %>% 
+  drop_na()
 ```
 
 ```{r plotting}
@@ -42,6 +70,44 @@ showtext_auto(enable = TRUE)
 # darkblue: #0c1454
 # yellow: #f0dd90
 # darkyellow: #e3c139
+library(gganimate)
+library(transformr)
+        
+rent %>% 
+  group_by(year) %>% 
+  ggplot(aes(x = year, y = price, group = year)) +
+  geom_boxplot() +
+  scale_y_log10() +
+  theme_minimal()
+
+permits %>% 
+  filter(proposed_use %in%
+           c("2 family dwelling", "apartments","1 family dwelling")) %>% 
+  group_by(neighborhoods_analysis_boundaries, year = year(filed_date)) %>% 
+  count(proposed_use) %>% 
+  ggplot(aes(x = year, y = n, fill = proposed_use)) +
+  geom_col(show.legend = T) +
+  theme_minimal()
+  # facet_wrap(~neighborhoods_analysis_boundaries, scales = "free_y")
+
+
+myMap <- get_stamenmap(bbox = c(left = -122.69,
+                                bottom = 37.65,
+                                right = -122.579,
+                                top = 37.8),
+          maptype = "terrain", 
+          crop = FALSE,
+          zoom = 15)
+
+ggmap(myMap)
+
+st_read(permits_clean_tbl)
+
+slice(permits_clean_tbl, 1:100)) %>%
+  ggplot() +
+  geom_sf()
+
+
 
 title <- str_to_upper(
   "**Increase in extreme wet conditions in eastern USA since 2000**"
