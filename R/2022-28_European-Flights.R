@@ -1,13 +1,16 @@
 
 topic <- "European-Flights"
-year <- lubridate::year(Sys.Date())
-week <- lubridate::week(Sys.Date())
+year <- 2022
+week <- 28
 yrwk <- glue::glue("{year}-{week}")
 plots_dir <- paste0(year, "-", week)
 fs::dir_create(here::here("plots", plots_dir))
 png_file <- glue::glue("{yrwk}_{topic}.png")
 pdf_file <- glue::glue("{yrwk}_{topic}.pdf")
 
+title <- "Europe's largest airports are approaching pre-covid flight numbers"
+subtitle <- "number of monthly commercial flights: <span style='color:#ff7f52;'>actuals</span> versus <span style='color:#208eb1;'>forecasts</span> based on pre-covid numbers"
+caption <- "Source: Eurocontrol"
 
 ## packages
 library(tidyverse)
@@ -15,164 +18,110 @@ library(janitor)
 library(lubridate)
 library(scales)
 library(ggtext)
-library(sf)
-library(glue)
-library(patchwork)
+library(tsibble)
+library(fable)
 library(showtext)
-font_add_google(name = "Libre Baskerville", family = "baskerville")
+font_add_google(name = "Rubik Mono One", family = "rubik-mono-one")
+font_add_google(name = "Heebo", family = "heebo")
 showtext_opts(dpi = 300)
 showtext_auto(enable = TRUE)
 
+## data
 flights <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-07-12/flights.csv')
-
-airports <- readr::read_csv("https://raw.githubusercontent.com/jpatokal/openflights/master/data/airports.dat",
-                            col_names = c("airport_id", "name", "city", "country", "iata", "icao",
-                                          "latitude", "longitude", "altitude", "timezone", "dst",
-                                          "tz_db_tz", "type", "source"))
 
 flights_tbl <- flights %>% 
   clean_names() %>% 
   rename(airport_label = pivot_label) %>% 
-  select(-ends_with("_2")) %>% 
-  left_join(airports, by = c("apt_icao" = "icao")) %>% 
-  filter(is.na(name))
- 
-unique(flights_tbl$apt_icao)
+  select(-ends_with("_2")) 
 
-airports %>% 
-  filter(country == "Spain") %>% View()
+top_12_icao <- flights_tbl %>% 
+  filter(year == 2019) %>% 
+  group_by(apt_icao) %>% 
+  summarise(flt_tot_1 = sum(flt_tot_1)) %>% 
+  arrange(desc(flt_tot_1)) %>% 
+  head(12) %>% 
+  pull(apt_icao)
 
+top_12_icao <- c(top_12_icao, "LTBA")
 
-flights_ctry_mth <- flights_tbl %>%  
-  group_by(country, year, month_num) %>% 
-  summarise(total_movements = sum(flt_tot_1),
-            .groups = "drop")
+flights_top12_tbl <- flights_tbl %>% 
+  filter(apt_icao %in% top_12_icao) %>% 
+  mutate(apt_icao = ifelse(apt_icao == "LTBA", "LTFM", apt_icao),
+         apt_name = case_when(apt_icao == "LTFM" ~ "Istanbul",
+                              TRUE ~ apt_name),
+         month = floor_date(flt_date, unit = "month"),
+         month = yearmonth(month)
+         ) %>% 
+  group_by(apt_name, month) %>% 
+  summarise(flights = sum(flt_tot_1),
+            .groups = "drop") %>% 
+  as_tsibble(key = apt_name, index = month)
 
-flights_ctry_mth %>% 
-  filter(year >= 2019) %>% 
-  group_by(country, month_num) %>% 
-  mutate(date = paste(year, month_num),
-         movement_index = total_movements / total_movements[year == 2019] * 100) %>% 
-  filter(year > 2019) %>% 
-  ggplot(aes(x = date, y = movement_index, fill = movement_index)) +
-  geom_hline(yintercept = 100, colour = "red", linetype = 2) +
-  geom_col(position = "dodge", alpha = .6) +
-  facet_wrap(~country) +
-  theme_minimal()
+flights_pre_covid <- flights_top12_tbl %>% filter(month <= yearmonth("2020-02-01"))
 
-flights_ctry_mth %>% 
-  filter(year >= 2019) %>% 
-  group_by(country, month_num) %>% 
-  mutate(date = paste(year, month_num),
-         movement_index = total_movements - total_movements[year == 2019])  %>% 
-  filter(year > 2019) %>% 
-  ggplot(aes(x = date, y = movement_index, fill = movement_index)) +
-  geom_hline(yintercept = 100, colour = "red", linetype = 2) +
-  geom_col(position = "dodge", alpha = .6) +
-  facet_wrap(~country) +
-  theme_minimal()
+forecast <- flights_pre_covid %>% 
+  model(
+    ets = ETS(flights)
+  ) %>% 
+  forecast(h = "3 years")
 
-skimr::skim(flights)
+flights_combined_tbl <- flights_top12_tbl %>% 
+  left_join(
+    forecast, by = c("apt_name", "month")
+  ) %>% 
+  rename(flights_forecast = .mean,
+         flights_actual = flights.x) %>% 
+  mutate(flights_forecast = ifelse(month == yearmonth("2020 Feb"),
+                                   flights_actual, flights_forecast))
 
-library(rnaturalearth)
-library(rnaturalearthdata)
+blue <- "#026996"
+coral <- "#ff7f52"
+coralred <- "#ff4141"
+yelloworange <- "#ffa443"
+cyancornflowerblue = "#208eb1"
 
-world <- ne_countries(scale = "medium", returnclass = "sf")
+## plotting
 
-ggplot(data = world) +
-  geom_sf() +
-  coord_sf(xlim = c(-25, 54.12), ylim = c(35.5, 73.97), expand = FALSE) +
-  theme_minimal()
-
-#crs = "+proj=laea +lat_0=52 +lon_0=10 +x_0=4321000 +y_0=3210000 +ellps=GRS80 +units=m +no_defs ",
-
-colours <- c(`2022` = "#C8102E",
-   `2018` = "#f57d90")
-
-blue <- "#012169"
-green <- "#00B140"
-# darkblue: #0c1454
-# yellow: #f0dd90
-# darkyellow: #e3c139
-
-title <- "GENDER   PAY   GAP   WIDENS"
-subtitle <- "in most regions between <span style='color:#f57d90;'>2018</span> and <span style='color:#C8102E;'>2022</span>"
-caption <- "Source: gender-pay-gap.service.gov.uk"
-
-plt_1 <- ggplot(paygap_regional, aes(x = median, y = region_rnk)) +
-  geom_vline(data = paygap_national,
-             aes(xintercept = median, colour = factor(year)),
-             linetype = 2,
-             show.legend = FALSE) +
-  geom_vline(aes(xintercept = 0), colour = green, linetype = 2, size = 1.2) +
-  geom_label(aes(x = 0, y = 12, label = "Equal Pay"),
-             colour = green,
-             family = "baskerville",
-             fontface = "italic",
-             fill = "#eff2f7") +
-  geom_label(aes(x = minimum - 3.7, y = 0, label = lbl_nat_min),
-             colour = "#f57d90",
-             family = "baskerville",
-             fontface = "italic",
-             fill = "#eff2f7") +
-  geom_label(aes(x = maximum + 3.7, y = 0, label = lbl_nat_max),
-             colour = "#C8102E",
-             family = "baskerville",
-             fontface = "italic",
-             fill = "#eff2f7") +
-  geom_line(aes(group = region_rnk, colour = line_col), size = 1.5,
-            show.legend = FALSE) + 
-  geom_point(aes(colour = factor(year)), size = 4,
-             show.legend = FALSE) +
-  geom_label(data = paygap_regional %>% group_by(region_name) %>%
-              filter(median == min(median)) %>%
-              filter(median < minimum),
-            aes(x = median - 0.5, y = region_rnk,
-            label = region_name), hjust = "right",
-            family = "baskerville", colour = blue, size = 8,
-            fill = "#eff2f7", label.size = NA) +
-  geom_label(data = paygap_regional %>% group_by(region_name) %>%
-              filter(median == max(median)) %>%
-              filter(median > maximum + 1),
-            aes(x = median + 0.5, y = region_rnk,
-            label = region_name), hjust = "left",
-            family = "baskerville", colour = blue, size = 8,
-            fill = "#eff2f7", label.size = NA) +
-  scale_x_continuous(
-    limits = c(-5, NA),
-    labels = number_format(suffix = "%", style_positive = "plus"),
-    expand = expansion(add = c(0,5))
-    ) +
-  scale_colour_manual(values = colours) +
-  labs(title = title,
+flights_combined_tbl %>% 
+  filter(year(month) > 2017) %>% 
+  ggplot(aes(x = month, y = flights_actual)) +
+  geom_area(colour = coral,
+            fill = coral, alpha =.2) +
+  geom_ribbon(aes(ymin = flights_actual, ymax = flights_forecast),
+              fill = cyancornflowerblue, alpha = .2) +
+  geom_line(aes(y = flights_forecast),
+            colour = cyancornflowerblue,
+            linetype = "dotted") +
+  scale_x_yearmonth(date_labels = "%Y") +
+  scale_y_continuous(labels = number_format(scale = 1/1e3, suffix = "k")) +
+  labs(title =title,
        subtitle = subtitle,
-       caption = caption,
+       caption = caption, 
        x = NULL, y = NULL) +
+  facet_wrap(~apt_name) +
   theme_minimal() +
-  theme(text = element_text(family = "baskerville"),
-        axis.text = element_text(colour = blue, size = 15),
+  theme(text = element_text(family = "heebo"),
+        axis.text = element_text(colour = blue, size = 10),
         plot.title.position = "plot",
-        plot.title = element_markdown(colour = blue,
+        plot.title = element_markdown(family = "rubik-mono-one",
+                                      colour = blue,
                                       face = "bold",
-                                      size = 28,
+                                      size = 12,
                                       hjust = 0.5,
                                       vjust = 3.5),
         plot.subtitle = element_markdown(colour = blue,
-                                         size = 24,
+                                         size = 10,
                                          hjust = 0.5,
                                          vjust = 3.5),
         plot.caption = element_text(colour = blue,
                                     size = 12,
                                     vjust = -5),
-        axis.text.y = element_blank(),
-        axis.text.x = element_text(vjust = -3),
-        panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_blank(),
+        strip.text = element_text(colour = blue),
         plot.margin = unit(c(1, 2, 1, 2), "cm"),
-        plot.background = element_rect(fill = "#eff2f7"))
+        plot.background = element_rect(fill = "#fcf3ea"))
 
-
-plt_1 + plot_layout(ncol = 1)
+## saving
 
 ggsave(here::here("plots", yrwk, pdf_file),
       width = 10, height = 8, dpi = 300,
