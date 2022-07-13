@@ -4,24 +4,19 @@ My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosyste
 
 ***
 
-### [2022-28](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-28)
-
-✈️ European Flight by [Eurocontrol](https://ansperformance.eu/data/)
+### [2022-28](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-28)✈️ European Flight by [Eurocontrol](https://ansperformance.eu/data/)
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-28_European-Flights.R)
 
 ![./plots/2022-26/2022-26_UK-Gender-Pay-Gap.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/plots/2022-28/2022-28_European-Flights.png)
 
-### [2022-26](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-26)
-
-🪙 👫 💷 [UK Gender Pay Gap](https://gender-pay-gap.service.gov.uk)
+### [2022-26](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-26)🪙 👫 💷 [UK Gender Pay Gap](https://gender-pay-gap.service.gov.uk)
 
 [Rendered code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-26_UK-Gender-Pay-Gap.html)
 
 ![./plots/2022-26/2022-26_UK-Gender-Pay-Gap.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/plots/2022-26/2022-26_UK-Gender-Pay-Gap.png)
 
-### [2022-25](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-25)
-🥇 [Juneteenth](https://isabella-b.com/blog/juneteenth-2020/)
+### [2022-25](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-25)🥇 [Juneteenth](https://isabella-b.com/blog/juneteenth-2020/)
 
 [Rendered code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-25_juneteenth.html)
 
