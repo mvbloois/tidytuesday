@@ -9,7 +9,7 @@ png_file <- glue::glue("{yrwk}_{topic}.png")
 pdf_file <- glue::glue("{yrwk}_{topic}.pdf")
 
 title <- "Vaccination rates in Mali"
-subtitle <- "% of children who received an immunization"
+subtitle <- "% of children who received an immunization (2019)"
 caption <- "Source: data.nber.org"
 
 ## packages
