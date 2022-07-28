@@ -21,8 +21,7 @@ font_add_google(name = "Tajawal", family = "domine")
 showtext_opts(dpi = 300)
 showtext_auto(enable = TRUE)
 
-#results <- cbs_search("immmigration", language = "en")
-#cbs_get_meta("84978NED")
+#results <- cbs_search("immmigration", language = "nl")
 #cbs_get_meta("85287NED")
 
 ## DATA ----
@@ -216,7 +215,7 @@ plt_4 <- top_tens_tbl %>% filter(type == "net migration") %>% plot_top_ten()
 plt_1 / (plt_2 + plt_3 + plt_4) + plot_layout(ncol = 1, widths = c(1, 2)) +
   plot_annotation(title = "Immigration to and emigration from the Netherlands",
                   subtitle = "by country of birth, excluding Dutch nationals",
-                  caption = "Source: CBS",
+                  caption = "Source: dataset 85287NED; CBS.nl",
                   theme = theme(text = element_text(family = "domine",
                                                     colour = text),
                                 plot.title = element_text(size = 26,
