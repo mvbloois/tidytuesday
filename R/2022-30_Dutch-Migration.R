@@ -164,12 +164,15 @@ plt_1 <- world_tbl %>%
   geom_col(fill = col) +
   geom_line(aes(y = immigration), size = 2, colour = h1) +
   geom_line(aes(y = emigration), size = 2, colour = h2) +
-  geom_text(aes(x = 2012, y = 200000, label = "immigration"),
+  geom_text(aes(x = 2013, y = 200000, label = "immigration"),
             family = "domine", colour = h1,
             size = 8) +
   geom_text(aes(x = 2017, y = 135000, label = "emigration"),
             family = "domine", colour = h2,
             size = 8) +
+  geom_text(aes(x = 2012, y = 60000, label = "net migration"),
+            family = "domine", colour = col,
+            size = 6) +
   scale_x_continuous(breaks = c(1995,2000,2005,2010, 2010, 2015, 2020)) +
   scale_y_continuous(labels = number_format(accuracy = 1L)) +
   labs(x = NULL, y = NULL,) +
