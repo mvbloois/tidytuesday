@@ -4,7 +4,14 @@ My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosyste
 
 ***
 
-### [2022-29](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-29)☎💉🧲️ Technology Adoption by [NBER](https:/data.nber.org)
+### [2022-30](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-30):netherlands: Migration by country of birth[CBS](https://opendata.cbs.nl)
+
+[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-30_Dutch-Migration.R)
+
+![./plots/2022-30/2022-30_Dutch-Migration.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/plots/2022-30/2022-30_Dutch-Migration.png)
+
+
+### [2022-29](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-29)☎💉🧲️ Technology Adoption by [NBER](https://data.nber.org)
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-29_Technology-Adoption.R)
 
