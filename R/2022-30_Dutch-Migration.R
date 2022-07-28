@@ -1,139 +1,234 @@
 
 topic <- "Dutch-Migration"
 year <- 2022
-week <- 29
+week <- 30
 yrwk <- glue::glue("{year}-{week}")
 plots_dir <- paste0(year, "-", week)
 fs::dir_create(here::here("plots", plots_dir))
 png_file <- glue::glue("{yrwk}_{topic}.png")
 pdf_file <- glue::glue("{yrwk}_{topic}.pdf")
 
-title <- "Vaccination rates in Mali"
-subtitle <- "% of children who received an immunization (2019)"
-caption <- "Source: data.nber.org"
-
 ## packages
 library(tidyverse)
-library(janitor)
 library(scales)
 library(ggtext)
 library(showtext)
 library(cbsodataR)
-font_add_google(name = "Mali", family = "mali")
+library(glue)
+library(patchwork)
+
+font_add_google(name = "Tajawal", family = "domine")
 showtext_opts(dpi = 300)
 showtext_auto(enable = TRUE)
 
-results <- cbs_search("immmigration", language = "en")
-cbs_get_meta("84978NED")
-cbs_get_meta("83518NED")
-## data
+#results <- cbs_search("immmigration", language = "en")
+#cbs_get_meta("84978NED")
+#cbs_get_meta("85287NED")
 
-anthor <- cbs_get_data(id = "83518NED", Geslacht = "T001038", 
-             Generatie = c("1012600", "2012605", "2013356", "2013357", 
-                           "T001040"), Perioden = c("2021MM05", "2021MM06", "2021MM07", 
-                                                    "2021MM08", "2021MM09", "2021MM10", "2021MM11", "2021MM12", 
-                                                    "2021JJ00", "2022MM01", "2022MM02", "2022MM03", "2022MM04", 
-                                                    "2022MM05"), select = c("Geslacht", "Migratieachtergrond", 
-                                                                            "Generatie", "Perioden", "Immigratie_1", "EmigratieInclusiefAdministratieveC_2"
-                                                    ))
-anthor %>% 
-  cbs_add_label_columns() %>% View()
+## DATA ----
 
-data_raw <-
+### * World ----
+
+continents_raw <-
   cbs_get_data(
-    id = "84978NED",
-    # Geslacht = "T001038",
-    RegioS = "NL01  ",
-    Perioden = c(
-      "2010JJ00",
-      "2011JJ00",
-      "2012JJ00",
-      "2013JJ00",
-      "2014JJ00",
-      "2015JJ00",
-      "2016JJ00",
-      "2017JJ00",
-      "2018JJ00",
-      "2019JJ00",
-      "2020JJ00"
-    ),
-    select = c(
-      "Geslacht",
-      "Leeftijd",
-      "Geboorteland",
-      "Perioden",
-      "RegioS",
-      "Immigratie_1",
-      "EmigratieInclusiefAdministratieveC_2"
+    id = "85287NED",
+    Geslacht = "T001038",
+    LeeftijdOp31December = "10000", 
+    BurgerlijkeStaat = "T001019",
+    Geboorteland = c("G008519", "G008520", "G008524", "G008525", "G008531", "G008691"),
+    select = c("Geslacht", "LeeftijdOp31December",
+               "BurgerlijkeStaat", "Geboorteland", "Perioden", "Immigratie_1", 
+               "EmigratieInclusiefAdministratieveC_2")
     )
+
+continents_tbl <- continents_raw %>% 
+  cbs_add_label_columns() %>% 
+  select(year = Perioden_label,
+         continent = Geboorteland_label,
+         immigration = Immigratie_1,
+         emigration = EmigratieInclusiefAdministratieveC_2) %>% 
+  pivot_longer(
+    cols = immigration:emigration,
+    names_to = "type",
+    values_to = "number"
+  ) %>% 
+  pivot_wider(
+    names_from = "continent",
+    values_from = "number"
+  ) %>% 
+  rename(Africa = 3,
+         Americas = 4,
+         Asia = 5,
+         Europe = 6,
+         Oceania = 7) %>% 
+  mutate(Europe = Europe - Nederland) %>% 
+  select(-Nederland) %>% 
+  pivot_longer(
+    cols = Africa:Oceania,
+    names_to = "continent",
+    values_to = "number"
+  ) %>% 
+  pivot_wider(
+    names_from = type,
+    values_from = number
+  ) %>% 
+  mutate(year = as.numeric(as.character(year)),
+         continent = factor(continent,
+                            levels = c("Oceania", "Americas", "Africa", "Asia", "Europe"))
+         ) %>% 
+  filter(year >= 2000)
+
+world_tbl <- continents_tbl %>% 
+  group_by(year) %>% 
+  summarise(across(immigration:emigration, sum)) %>% 
+  mutate(net_migration = immigration-emigration)
+ 
+### * Countries ----
+
+countries_raw <-
+  cbs_get_data(
+    id = "85287NED",
+    Geslacht = "T001038",
+    LeeftijdOp31December = "10000", 
+    BurgerlijkeStaat = "T001019",
+    #Geboorteland = c("G008519", "G008520", "G008524", "G008525", "G008531"),
+    select = c("Geslacht", "LeeftijdOp31December",
+               "BurgerlijkeStaat", "Geboorteland", "Perioden", "Immigratie_1", 
+               "EmigratieInclusiefAdministratieveC_2")
   )
 
-data_tbl <- data_raw %>%
+countries_tbl <- countries_raw %>% 
+  filter(Geboorteland >= "G008533", Geboorteland < "T001175") %>% 
   cbs_add_label_columns() %>% 
-  select(sex = Geslacht_label,
-         age = Leeftijd_label,
-         country_of_birth = Geboorteland_label,
-         year = Perioden_label,
-         region = RegioS_label,
+  mutate(across(where(is.factor), as.character)) %>% 
+  select(year = Perioden_label,
+         country = Geboorteland_label,
          immigration = Immigratie_1,
-         emigration = EmigratieInclusiefAdministratieveC_2) 
+         emigration = EmigratieInclusiefAdministratieveC_2) %>% 
+  filter(year >= 2000)
 
-View(data_tbl)
+top_ten_tbl <- countries_tbl %>% 
+  group_by(country) %>% 
+  summarise(across(immigration:emigration, sum)) %>% 
+  mutate(net_migration = immigration-emigration)
 
-c_o_b_exclude <- c("Totaal", "GIPS landen in de EU", "Europese Unie (exclusief Nederland)",
-                   "Midden- en Oost-Europese landen in de EU")
+top_tens_tbl <- 
+  bind_rows(
+top_immigration <- top_ten_tbl %>% 
+  filter(country != "Nederland") %>% 
+  arrange(desc(immigration)) %>% 
+  head(10) %>% 
+  mutate(type = "immigration") %>% 
+  select(country, type, number = immigration)
+,
+top_emigration <- top_ten_tbl %>% 
+  filter(country != "Nederland") %>% 
+  arrange(desc(emigration)) %>% 
+  head(10) %>% 
+  mutate(type = "emigration") %>% 
+  select(country, type, number = emigration)
+,
+top_net <- top_ten_tbl %>% 
+  filter(country != "Nederland") %>% 
+  arrange(desc(abs(net_migration))) %>% 
+  head(10) %>% 
+  mutate(type = "net migration") %>% 
+  select(country, type, number = net_migration)
+) %>% 
+  mutate(country = case_when(country == "Polen" ~ "Poland",
+                             country == "Duitsland" ~ "Germany",
+                             country == "Syrië" ~ "Syria",
+                             country == "Verenigd Koninkrijk" ~ "UK",
+                             country == "Bulgarije" ~ "Bulgaria",
+                             country == "Turkije" ~ "Turkey",
+                             country == "Verenigde Staten van Amerika" ~ "USA",
+                             country == "Roemenië" ~ "Romania",
+                             country == "Spanje" ~ "Spain",
+                             country == "Frankrijk" ~ "France",
+                             country == "Italië" ~ "Italy",
+                             country == "België" ~ "Belgium",
+                             country == "Marokko" ~ "Morocco",
+                             TRUE ~ country))
 
-data_tbl %>% 
-  filter(country_of_birth == "Eritrea") %>% 
-  filter(year %in% 2012:2020) %>% 
-  filter(!age == "Totaal") %>% 
-  filter(!sex == "Totaal mannen en vrouwen") %>% 
-  group_by(sex, age, country_of_birth, year) %>% 
-  summarise(immigration = sum(immigration, na.rm = TRUE)) %>% 
-  pivot_wider(names_from = sex, values_from = immigration) %>% 
-  ggplot(aes(x = age, y = -Mannen)) +
-  geom_col(fill = "blue") +
-  geom_col(aes(y = Vrouwen), fill = "pink") +
-  scale_y_continuous(labels = abs) +
-  labs(x = "", y = "") +
+## Colours ----
+
+background <- "#474B4F"
+col <- "#648381"
+line <- "#648381"
+text <- "#E4FDE1"
+h1 <- "#8ACB88"
+h2 <- "#FFBF46"
+## Plots ----
+ 
+plt_1 <- world_tbl %>% 
+  ggplot(aes(x = year, y = net_migration)) +
+  geom_col(fill = col) +
+  geom_line(aes(y = immigration), size = 2, colour = h1) +
+  geom_line(aes(y = emigration), size = 2, colour = h2) +
+  geom_text(aes(x = 2012, y = 200000, label = "immigration"),
+            family = "domine", colour = h1,
+            size = 8) +
+  geom_text(aes(x = 2017, y = 135000, label = "emigration"),
+            family = "domine", colour = h2,
+            size = 8) +
+  scale_x_continuous(breaks = c(1995,2000,2005,2010, 2010, 2015, 2020)) +
+  scale_y_continuous(labels = number_format(accuracy = 1L)) +
+  labs(x = NULL, y = NULL,) +
+  theme_minimal() +
+  theme(text = element_text(family = "domine",
+                            size = 14),
+        plot.title.position = "plot",
+        axis.line = element_line(colour = line),
+        panel.grid = element_blank(),
+        axis.text = element_text(family = "domine",
+                                 colour = text)
+        
+  )
+
+plot_top_ten <- function(df) {
+  
+  type <- unique(df$type)
+  title = glue("Contributors to {type}")
+  
+  ggplot(data = df,
+         aes(x = fct_reorder(country, number), y = number)) +
+  geom_col(fill = col) +
+  scale_y_continuous(limits = c(0, 4e5),
+                     labels = number_format(scale = 1/1e3, suffix = "k")) +
+  labs(x = NULL, y = NULL, title = title) +
   coord_flip() +
-  facet_wrap(~year) +
-  theme_minimal()
+  theme_minimal() +
+    theme(text = element_text(family = "domine",
+                              colour = text,
+                              size = 14),
+          plot.title.position = "plot",
+          axis.line = element_line(colour = line),
+          axis.text = element_text(family = "domine",
+                                   colour = text),
+          panel.grid = element_blank())
+}
 
-
-data_tbl %>% 
-  filter(region == "Nederland") %>% 
-  filter(!country_of_birth %in% continents) %>% 
-  filter(!country_of_birth %in% c_o_b_exclude) %>% 
-  group_by(country_of_birth) %>% 
-  mutate(m_i = max(immigration),
-         m_e = max(emigration)) %>% 
-  View()
-
-
-unique(data_tbl$country_of_birth)
-
-green <- "#14B53A"
-yellow <- "#FCD116"
-red <- "#CE1126"
-blue <- "#68b0e5"
-
-continents <- c("Afrika", "Amerika", "Azië", "Europa (inclusief Nederland)", "Oceanië")
-
-data_tbl %>% 
-  filter(country_of_birth == "Ethiopië") %>% 
-  filter(str_detect(region, "\\(PV\\)")) %>% 
-  group_by(year, country_of_birth, region) %>% 
-  summarise(immigration = sum(immigration),
-            emigration = sum(emigration)) %>% 
-  ggplot(aes(x = year, y = immigration, fill = country_of_birth)) +
-  geom_col() +
-  geom_col(aes(y = -emigration)) +
-  facet_wrap(~region) +
-  theme_minimal()
-
+plt_2 <- top_tens_tbl %>% filter(type == "immigration") %>% plot_top_ten()
+plt_3 <- top_tens_tbl %>% filter(type == "emigration") %>% plot_top_ten()
+plt_4 <- top_tens_tbl %>% filter(type == "net migration") %>% plot_top_ten()
 
 ## saving
+plt_1 / (plt_2 + plt_3 + plt_4) + plot_layout(ncol = 1, widths = c(1, 2)) +
+  plot_annotation(title = "Immigration to and emigration from the Netherlands",
+                  subtitle = "by country of birth, excluding Dutch nationals",
+                  caption = "Source: CBS",
+                  theme = theme(text = element_text(family = "domine",
+                                                    colour = text),
+                                plot.title = element_text(size = 26,
+                                                          hjust = 0.5),
+                                plot.subtitle = element_text(size = 22,
+                                                             hjust = 0.5),
+                                plot.background = element_rect(fill = background,
+                                                               colour = NA)
+                                )
+                  )
+  
+
 
 ggsave(here::here("plots", yrwk, pdf_file),
       width = 10, height = 10, dpi = 300,
@@ -142,4 +237,3 @@ ggsave(here::here("plots", yrwk, pdf_file),
 ggsave(here::here("plots", yrwk, png_file),
       width = 10, height = 10, dpi = 300,
       device = "png")
-
