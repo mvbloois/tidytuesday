@@ -4,6 +4,13 @@ My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosyste
 
 ***
 
+### [2022-31](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-31):frog::frog: Oregon Spotted Frog by [usgs.gov spotted frog data](https://www.sciencebase.gov/catalog/item/60ba5a00d34e86b9388d86bc)
+
+[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-31_Oregon-Spotted-Frog.R)
+
+![./plots/2022-31/2022-31_Oregon-Spotted-Frog.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/plots/2022-31/2022-31_Oregon-Spotted-Frog.png)
+
+
 ### [2022-30](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-30):netherlands: Migration by country of birth by [CBS](https://opendata.cbs.nl)
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-30_Dutch-Migration.R)
