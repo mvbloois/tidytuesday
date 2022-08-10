@@ -47,7 +47,7 @@ wheels <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tid
   select(-1) %>% 
   filter(country == "USA") %>% 
   mutate(coords = map(location, geocode)) %>% 
-  unnest()
+  unnest(cols = c(coords))
 ```
 
 ```{r}
@@ -113,11 +113,11 @@ ggplot() +
 
 ```{r}
 ggsave(here::here("plots", yrwk, pdf_file),
-      width = 12, height = 10, dpi = 300,
+      width = 12, height = 8, dpi = 300,
       device = cairo_pdf)
 
 ggsave(here::here("plots", yrwk, png_file),
-      width = 12, height = 10, dpi = 300,
+      width = 12, height = 8, dpi = 300,
       device = "png")
 ```
 
