@@ -4,6 +4,13 @@ My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosyste
 
 ***
 
+### [2022-32](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-32):ferris::ferris: {ferriswheels} by [Emil Hvitveldt](https://github.com/EmilHvitfeldt/ferriswheels)
+
+[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-32_Ferris-Wheels.R)
+
+![./plots/2022-32/2022-32_2_Ferris-Wheels.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/plots/2022-32/2022-32_Ferris-Wheels.png)
+
+
 ### [2022-31](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-31):frog::frog: Oregon Spotted Frog by [usgs.gov spotted frog data](https://www.sciencebase.gov/catalog/item/60ba5a00d34e86b9388d86bc)
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-31_Oregon-Spotted-Frog.R)
