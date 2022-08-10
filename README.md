@@ -4,7 +4,7 @@ My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosyste
 
 ***
 
-### [2022-32](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-32):ferris::ferris: {ferriswheels} by [Emil Hvitveldt](https://github.com/EmilHvitfeldt/ferriswheels)
+### [2022-32](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-32):ferriswheel::ferriswheel: {ferriswheels} by [Emil Hvitveldt](https://github.com/EmilHvitfeldt/ferriswheels)
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-32_Ferris-Wheels.R)
 
