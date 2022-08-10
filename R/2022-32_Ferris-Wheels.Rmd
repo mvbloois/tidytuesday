@@ -1,0 +1,123 @@
+---
+title: "Ferris Wheels"
+author: "Martijn van Bloois"
+date: "2022-08-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+```
+
+```{r}
+topic <- "Ferris-Wheels"
+year <- 2022
+week <- 32
+yrwk <- glue::glue("{year}-{week}")
+plots_dir <- paste0(year, "-", week)
+fs::dir_create(here::here("plots", plots_dir))
+png_file <- glue::glue("{yrwk}_{topic}.png")
+pdf_file <- glue::glue("{yrwk}_{topic}.pdf")
+```
+
+```{r}
+suppressMessages(library(tidyverse))
+library(scales)
+library(ggtext)
+library(showtext)
+library(janitor)
+library(sf)
+library(tigris)
+library(ggmap)
+library(ggbump)
+
+# register_google(key = "YOUR KEY HERE")
+``` 
+
+```{r}
+font_add_google(name = "Dancing Script", family = "title-font")
+font_add_google(name = "Cabin", family = "main-font")
+showtext_opts(dpi = 300)
+showtext_auto(enable = TRUE)
+```
+
+```{r}
+wheels <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-08-09/wheels.csv') %>% 
+  clean_names() %>% 
+  select(-1) %>% 
+  filter(country == "USA") %>% 
+  mutate(coords = map(location, geocode)) %>% 
+  unnest()
+```
+
+```{r}
+us_geo <- states(class = "sf") %>% 
+  filter(REGION != 9) %>% 
+  filter(!NAME %in% c("Alaska", "Hawaii"))
+
+y_seq <- seq(from=39,to=8,length.out=19)
+
+wheels_tbl <-  wheels %>%  
+  arrange(desc(lat)) %>% 
+  mutate(rank = y_seq[row_number()],
+         xend = -65,
+         x_axis_start = xend - 5,
+         h = 50 / 728 * height,
+         h_label = if_else(str_length(name) * 13 < height, paste(height, "ft"), ""))
+
+subtitle <- "Historic, current and future ferris wheels in the U.S.A. Taken from the dataset {ferriswheels} by @Emil_Hvitfeldt."
+```
+
+``` {r}
+ggplot() +
+  geom_sf(data = us_geo,
+          fill = "transparent",
+          colour = "grey40") +
+  geom_point(data = wheels_tbl,
+             aes(x = lon, y = lat, colour = location)) +
+  geom_sigmoid(data = wheels_tbl, 
+               aes(x = lon, y = lat, xend = x_axis_start - .2, yend = rank, group = name, colour = location), 
+               alpha = .6, smooth = 10, size = 0.8) +
+  geom_segment(data = wheels_tbl,
+               aes(x = x_axis_start, xend = x_axis_start + h,
+                   y = rank, yend = rank,
+                   colour = location),
+               size = 1.5) +
+  geom_text(data = wheels_tbl, 
+            aes(x = x_axis_start, y = rank, label = name),
+            color = "grey30",
+            hjust = 0, size = 2.5, nudge_y = .8) +
+  geom_text(data = wheels_tbl, 
+            aes(x = x_axis_start + h, y = rank, label = h_label),
+            color = "grey30",
+            hjust = 1, size = 2.5, nudge_y = .8) +
+  coord_sf(xlim = c(-124, -10),
+           ylim = c(5,50)) +
+  labs(title = "Round 'n Round",
+       subtitle = str_wrap(subtitle, 60),
+       caption = "Source: emilhvitfeldt/ferriswheels") +
+  theme_void() +
+  theme(plot.title = element_text(family = "title-font",
+                                  size =  36,
+                                  hjust = 0.5),
+        plot.subtitle = element_text(family = "main-font",
+                                  size =  20,
+                                  hjust = 0.5),
+        plot.caption =  element_text(family = "main-font",
+                                  size =  14),
+        plot.title.position = "plot",
+        legend.position = "none",
+        plot.background = element_rect(fill = "#F4F4F4",
+                                       colour = NA))
+```
+
+```{r}
+ggsave(here::here("plots", yrwk, pdf_file),
+      width = 12, height = 10, dpi = 300,
+      device = cairo_pdf)
+
+ggsave(here::here("plots", yrwk, png_file),
+      width = 12, height = 10, dpi = 300,
+      device = "png")
+```
+
