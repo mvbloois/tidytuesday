@@ -1,7 +1,7 @@
 ---
-title: "Ferris Wheels"
+title: "Bigfoot"
 author: "Martijn van Bloois"
-date: "2022-08-09"
+date: "2022-09-14"
 output: html_document
 ---
 
@@ -23,18 +23,9 @@ pdf_file <- glue::glue("{yrwk}_{topic}.pdf")
 ```{r}
 suppressMessages(library(tidyverse))
 library(lubridate)
-library(ggdist)
-
+library(patchwork)
 library(scales)
-library(ggtext)
 library(showtext)
-library(janitor)
-library(sf)
-library(tigris)
-library(ggmap)
-library(ggbump)
-
-# register_google(key = "YOUR KEY HERE")
 ``` 
 
 ```{r}
@@ -45,91 +36,103 @@ showtext_auto(enable = TRUE)
 ```
 
 ```{r}
-bigfoot <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-09-13/bfro_reports_geocoded.csv")
-
-glimpse(bigfoot)
-```
-
-```{r}
-bigfoot %>% 
-  count(state, sort = TRUE)
-
-state_county_n <- bigfoot %>% 
-  count(state, county, sort = TRUE)
-
-bigfoot %>% 
-  count(season, sort = TRUE)
-
-bigfoot %>% 
-  count(classification, sort = TRUE)
-
-bigfoot %>% 
-  count(year(date))
-
-bigfoot %>% 
-  distinct(state, county) %>% 
-  count(county, sort = T)
+# colours
+c_text <- "#ededed"
+c_background <- "#36454f"
 ```
 
 
+```{r}
+theme_set(theme_minimal())
+
+theme_update(
+    text = element_text(family = "main-font",
+                        colour = c_text),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    axis.text.x = element_text(face = "bold",
+                               colour = c_text,
+                               size = 14),
+    axis.text.y = element_text(face = "bold",
+                               colour = c_text,
+                               size = 14,
+                               vjust = -0.1),
+    plot.background = element_rect(fill = c_background,
+                                   colour = NA),
+    plot.title = element_text(hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5),
+    plot.title.position = "plot"
+)
+```
+
 
 ```{r}
-states <- tigris::counties(class = "sf") %>% 
-  select(STATEFP, STATENAME = NAME) %>% 
-  as_tibble() %>% 
-  select(-3)
+bigfoot <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-09-13/bigfoot.csv')
+```
 
-us_counties <- tigris::counties(class = "sf", cb = TRUE) %>% 
-  shift_geometry() %>% 
-  filter(STATEFP < 60) %>% 
-  inner_join(states, by = "STATEFP") %>% 
-  left_join(state_county_n, by = c("STATENAME" = "state", "NAMELSAD" = "county"))
+
+```{r}
+states <- map_data("state", col = "grey40")
 ```
 
 ``` {r}
-plt_map <- ggplot(us_counties) +
-  geom_sf(size = 0.1) +
-  geom_point(
-    aes(colour = n, size = n, geometry = geometry),
-    stat = "sf_coordinates",
-    alpha = 0.7
-  ) +
-  scale_colour_gradient(position="bottom" , low = "blue", high = "red" 
-                       )  +
-  theme_void() +
-  theme(plot.title = element_text(family = "title-font",
-                                  size =  36,
-                                  hjust = 0.5),
-        plot.subtitle = element_text(family = "main-font",
-                                  size =  20,
-                                  hjust = 0.5),
-        plot.caption =  element_text(family = "main-font",
-                                  size =  14),
-        plot.title.position = "plot",
-        legend.position = "none",
-        plot.background = element_rect(fill = "#F4F4F4",
-                                       colour = NA))
+plt_map <- bigfoot %>% 
+  filter(year(date) >= 1950) %>% 
+  filter(longitude > -130) %>% 
+  ggplot(aes(x = longitude, y = latitude)) +
+  geom_polygon(data = states,
+               aes(x = long, y = lat, group = group),
+               fill = c_background, colour = "grey50") +
+  geom_point(colour = "#40FF00", size = 1, alpha = .2) +
+  labs(x = NULL, y = NULL) +
+  theme_void()+
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        panel.grid.major.y = element_blank(),
+        panel.grid.major.x = element_blank(),
+        plot.background = element_rect(fill = c_background, colour = c_background))+
+  coord_map("albers",  lat0 = 45.5, lat1 = 29.5)
+``` 
 
-bigfoot %>% 
-  mutate(year = year(date)) %>% 
-  distinct(state, year) %>% 
-  filter(year >= 1980) %>% 
-  drop_na() %>% 
-  ggplot(aes(x = year, y = state)) +
-  stat_halfeye(
-    alpha = .6,
-    n = 10000,
-    adjust = .1, 
-    trim = FALSE,
-    color = NA,
-    height = 1.5,
-    justification = -.05
-  ) +
-  theme_minimal()
+``` {r}
+
+c_seasons <- c("FALL" = "#804000", "SPRING" = "#40C000", "WINTER" = "#40C0FF", "SUMMER" = "#FFC000")
+
+plt_season <- bigfoot %>% 
+  filter(year(date) >= 1950) %>% 
+  filter(season != "Unknown") %>% 
+  mutate(season = str_to_upper(season),
+         season = factor(season,
+                         levels = c("SPRING", "SUMMER", "FALL", "WINTER"))
+         ) %>% 
+  group_by(season) %>% 
+  summarise(n = n()) %>% 
+  ggplot(aes(x = season, y = n, fill = season)) +
+  geom_col(show.legend = FALSE) +
+  scale_fill_manual(values = c_seasons) +
+  labs(x = NULL, y = NULL) 
+
+plt_time <- bigfoot %>% 
+  group_by(year = year(date)) %>% 
+  summarise(n = n()) %>% 
+  filter(year >= 1950) %>% 
+  ggplot(aes(x = year, y = n)) +
+  geom_col(fill =  "#40FF00", show.legend = FALSE) +
+  labs(x = NULL, y = NULL) 
 ```
 
 ```{r}
-plt_map
+plt_time / (plt_season +  plt_map) +
+  plot_annotation(
+    title = "BIGFOOT SIGHTINGS",
+    subtitle = str_wrap("Bigfoot sightings peaked in 2004. Washington State has the most sightings since 1950, followed by Ohio,
+    Florida and California. Summer is the best time for a sighting.", width = 90),
+    caption = "Source: Bigfoot Field Research Organisation",
+    theme = theme(plot.title = element_text(size = 36, face = "bold"),
+                  plot.subtitle = element_text(size = 18),
+                  plot.caption = element_text(size = 12))
+  )
 
 ggsave(here::here("plots", yrwk, pdf_file),
       width = 12, height = 8, dpi = 300,
