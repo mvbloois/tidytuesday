@@ -1,0 +1,108 @@
+---
+title: "Hydro Wastewater Plants"
+author: "Martijn van Bloois"
+date: "2022-09-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+```
+
+```{r}
+topic <- "Hydro-Wastewater-Plants"
+year <- 2022
+week <- 38
+yrwk <- glue::glue("{year}-{week}")
+plots_dir <- paste0(year, "-", week)
+fs::dir_create(here::here("plots", plots_dir))
+png_file <- glue::glue("{yrwk}_{topic}.png")
+pdf_file <- glue::glue("{yrwk}_{topic}.pdf")
+```
+
+```{r}
+suppressMessages(library(tidyverse))
+library(lubridate)
+library(patchwork)
+library(scales)
+library(countrycode)
+library(sf)
+library(rnaturalearth)
+library(showtext)
+``` 
+
+```{r}
+font_add_google(name = "Fira Mono", family = "title-font")
+font_add_google(name = "Fira Sans", family = "main-font")
+showtext_opts(dpi = 300)
+showtext_auto(enable = TRUE)
+```
+
+
+```{r}
+HydroWASTE_v10 <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-09-20/HydroWASTE_v10.csv')%>% 
+  filter(STATUS %in% c("Operational", "Not Reported")) %>% 
+  mutate(continent = countrycode(CNTRY_ISO, "iso3c", "continent"),
+         continent = if_else(CNTRY_ISO == "XKX", "Europe", continent),
+         DF = if_else(is.na(DF), 100, DF),
+         low_df = if_else(DF < 10, "< 10", ">= 10")) 
+```
+
+```{r}
+robinson <- "+proj=robin +lon_0=0 +x_0=0 +y_0=0 +datum=WGS84 +units=m +no_defs"
+
+world_sf <- ne_countries(return="sf") %>% st_transform(robinson)
+wwtp_sf <-  HydroWASTE_v10 %>% st_as_sf(coords=c("LON_WWTP","LAT_WWTP"), crs="+proj=longlat +datum=WGS84") %>% st_transform(robinson)
+```
+
+``` {r}
+title <-  str_to_upper("Wastewater Treatment Plants")
+subtitle  <- str_wrap("The main objective of wastewater treatment plants (WWTPs) is to remove pathogens, nutrients, organics, and other pollutants from wastewater. After these contaminants are partially or fully removed, the treated effluents are discharged into receiving waterbodies. However, since WWTPs cannot remove all contaminants, they inevitably represent concentrated point sources of residual contaminant loads into surface waters. 2533 Plants show a dilution factor of less than 10, which represents a common threshold for environmental concern.", 80)
+caption <-  str_wrap("Source: Ehalt Macedo, et.al.: Distribution and characteristics of wastewater treatment plants within the global river network, Earth Syst. Sci. Data, 14, 559–577, https://doi.org/10.5194/essd-14-559-2022, 2022.", 80)
+
+ggplot() +
+  geom_sf(data=world_sf, size=.3, color="#333344", fill = "antiquewhite1") +
+  geom_sf(data=wwtp_sf %>% filter(low_df == ">= 10"), colour = "#53c151", size=.1, alpha=.2, show.legend = T) +
+  geom_sf(data=wwtp_sf %>% filter(low_df == "< 10"), colour = "#ce3723", size = 0.15) +
+  scale_colour_manual(values = c("DF >= 10" = "#53c151", "DF < 10" = "#ce3723")) +
+  guides(colour = guide_legend(override.aes = list(size = 6, colour = c("#53c151", "#ce3723"),
+                                                   alpha = 1)),
+         alpha = "none") +
+  coord_sf(ylim = c(-5772347, 8343004)) +
+  labs(title = title,
+       subtitle = subtitle,
+       caption = caption,
+       colour = "Dilution Factor") +
+  theme(
+    legend.position = "bottom",
+    legend.background = element_rect(fill = "aliceblue"),
+    legend.key = element_rect(fill = "antiquewhite1"),
+    plot.title = element_text(family = "title-font",
+                              colour = "black",
+                              size = 36,
+                              hjust = 0.5),
+    plot.subtitle = element_text(family = "main-font",
+                                 colour = "black",
+                                 size = 16,
+                                 hjust = 0.5),
+    plot.caption = element_text(family = "main-font",
+                                colour = "black"),
+    axis.text.x = element_blank(),
+    axis.ticks.x = element_blank(),
+    panel.background = element_rect(fill = "aliceblue",
+                                    colour = "aliceblue"),
+    plot.background =  element_rect(fill = "aliceblue")
+  )
+``` 
+
+```{r}
+ggsave(here::here("plots", yrwk, pdf_file),
+      width = 12, height = 8, dpi = 300,
+      device = cairo_pdf)
+
+ggsave(here::here("plots", yrwk, png_file),
+      width = 12, height = 8, dpi = 300,
+      device = "png")
+```
+
+
