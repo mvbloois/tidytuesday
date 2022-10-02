@@ -6,7 +6,7 @@ My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosyste
 
 ### [2022-39](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-39)🎨🖼 Artists in the U.S.A. by [arts.gov](https://www.arts.gov/impact/research/arts-data-profile-series/adp-31/data-tables)
 
-[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-39_Artists-in-the-USA.Qmd)
+[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-39_Artists-in-the-USA.qmd)
 
 ![./plots/2022-38/2022-39_Artists.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/plots/2022-39/2022-39_Artists.png)
 
