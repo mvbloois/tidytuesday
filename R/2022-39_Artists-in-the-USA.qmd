@@ -54,7 +54,7 @@ blue <- "#2d74a8"
 red <- "#cb4f29"
 yellow <- "#ebcf61"
 orange <- "#c56e29"
-size <- 2
+size <- 2.5
 alpha <- 0.9
 
 ggplot() +
