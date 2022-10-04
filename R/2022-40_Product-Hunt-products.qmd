@@ -1,0 +1,129 @@
+---
+title: "2022-40_Product-Hunt-products"
+author: "Martijn van Bloois"
+format: html
+editor: visual
+---
+
+```{r}
+topic <- "Product-Hunt-products"
+year <- 2022
+week <- 40
+yrwk <- glue::glue("{year}-{week}")
+plots_dir <- paste0(year, "-", week)
+fs::dir_create(here::here("plots", plots_dir))
+png_file <- glue::glue("{yrwk}_{topic}.png")
+pdf_file <- glue::glue("{yrwk}_{topic}.pdf")
+```
+
+```{r}
+suppressMessages(library(tidyverse))
+library(lubridate)
+library(scales)
+library(showtext)
+library(PrettyCols)
+library(ggrepel)
+```
+
+```{r}
+font_add_google(name = "Chakra Petch", family = "title")
+font_add_google(name = "Tinos", family = "font")
+showtext_opts(dpi = 300)
+showtext_auto(enable = TRUE)
+```
+
+
+```{r}
+product_hunt <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-10-04/product_hunt.csv')
+```
+
+```{r}
+# colours
+c_text <- PrettyCols::prettycols("Relax")[2]
+c_background <- PrettyCols::prettycols("Relax")[1]
+c_points <- PrettyCols::prettycols("Relax")[4]
+c_title <-  PrettyCols::prettycols("Relax")[3]
+
+theme_set(theme_minimal())
+
+theme_update(
+    text = element_text(family = "font",
+                        colour = c_text),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    axis.ticks.x = element_line(colour = c_text),
+    axis.text.x = element_text(face = "bold",
+                               colour = c_text,
+                               size = 18),
+    axis.text.y = element_text(face = "bold",
+                               colour = c_text,
+                               size = 18,
+                               hjust = 1),
+    plot.background = element_rect(fill = c_background,
+                                   colour = NA),
+    plot.title = element_text(family = "title",
+                              colour = c_title,
+                              size = 32,
+                              hjust = 0.5),
+    plot.subtitle = element_text(size = 22,
+                                 hjust = 0.5),
+    plot.title.position = "plot"
+)
+```
+
+
+```{r}
+top_two <- product_hunt %>% 
+  slice_max(order_by = upvotes, n = 2) %>% 
+  mutate(y_start = year(release_date),
+         y_end = y_start + 0.2,
+         x_start = upvotes,
+         x_end = x_start - (upvotes*0.15),
+         makers = str_remove_all(makers, "[\\['\\]]"),
+         makers = str_replace(makers, ",", " &" ),
+         label = glue::glue("{name} by {makers}"))
+
+count_year <- product_hunt %>% 
+  count(year = year(release_date)) %>% 
+  mutate(n = number_format(1L)(n))
+
+product_hunt %>% 
+  mutate(year = year(release_date)) %>% 
+  group_by(year) %>% 
+  ggplot(aes(x = upvotes, y = year)) +
+  geom_point(size = 8, shape = "|", colour = c_points,
+             alpha = .6) +
+  geom_point(data = top_two, aes(x = upvotes, y = y_start),
+             size = 8, shape = "|", colour = c_points) +
+  geom_text(data = count_year, aes(x = 0, y = year, label = n),
+            colour = c_text, hjust = 1.2, size = 3) +
+  geom_text(data = count_year, aes(x = 0, y = 2021.5, label = "# products"),
+            colour = c_text, hjust = 1.1, size = 2) +
+  geom_label(data = top_two, aes(x = x_end, y = y_start + 0.8, label = label),
+                   fill = c_background, colour = c_title) +
+  geom_curve(data = top_two,
+             aes(x = x_start - 100, y = y_start, xend = x_end, yend = y_end + 0.4),
+             colour = c_text,
+             curvature = -0.2,
+             arrow = arrow(length = unit(0.03, "npc"))
+             )+
+  scale_x_continuous(limits = c(-1000, NA), labels = number_format()) +
+  scale_y_continuous(breaks = 2012:2021) +
+  labs(title = str_to_upper("Upvotes for products on Product Hunt"),
+       subtitle = str_wrap("Product Hunt founder Ryan Hoover decided to build a central location to replace the word-of-mouth process his peers used to promote tech products they liked or had built.", 90),
+       caption = "Source: components.one",
+       x = "Number of upvotes", y = NULL)
+```
+
+
+```{r}
+ggsave(here::here("plots", yrwk, pdf_file),
+      width = 12, height = 8, dpi = 300,
+      device = cairo_pdf)
+
+ggsave(here::here("plots", yrwk, png_file),
+      width = 12, height = 8, dpi = 300,
+      device = "png")
+```
