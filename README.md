@@ -4,11 +4,18 @@ My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosyste
 
 ***
 
+### [2022-40](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-40)Product Hunt products by [components.one](https://components.one/datasets/product-hunt-products)
+
+[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-40_Product-Hunt-products.qmd)
+
+![./plots/2022-40/2022-40_Product-Hunt-products.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/plots/2022-40/2022-40_Product-Hunt-products.png)
+
+
 ### [2022-39](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-39)🎨🖼 Artists in the U.S.A. by [arts.gov](https://www.arts.gov/impact/research/arts-data-profile-series/adp-31/data-tables)
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-39_Artists-in-the-USA.qmd)
 
-![./plots/2022-38/2022-39_Artists.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/plots/2022-39/2022-39_Artists.png)
+![./plots/2022-39/2022-39_Artists.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/plots/2022-39/2022-39_Artists.png)
 
 
 ### [2022-38](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-38)🚰🚱 Wastewater Treatment Plants by [Heloisa Ehalt Macedo et al.](https://essd.copernicus.org/articles/14/559/2022/)
