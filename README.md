@@ -4,6 +4,13 @@ My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosyste
 
 ***
 
+### [2022-41](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-41)Ravelry yarn by [ravelry.com](https://www.raverlry.com)
+
+[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-41_Ravelry.Rmd)
+
+![./plots/2022-41/2022-41_Ravelry.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/plots/2022-41/2022-41_Ravelry.png)
+
+
 ### [2022-40](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-40)Product Hunt products by [components.one](https://components.one/datasets/product-hunt-products)
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-40_Product-Hunt-products.qmd)
