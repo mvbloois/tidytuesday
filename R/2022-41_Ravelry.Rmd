@@ -1,0 +1,173 @@
+---
+title: "Ravelry"
+author: "Martijn van Bloois"
+date: "2022-10-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+```
+
+```{r}
+topic <- "Ravelry"
+year <- 2022
+week <- 41
+yrwk <- glue::glue("{year}-{week}")
+plots_dir <- paste0(year, "-", week)
+fs::dir_create(here::here("plots", plots_dir))
+png_file <- glue::glue("{yrwk}_{topic}.png")
+pdf_file <- glue::glue("{yrwk}_{topic}.pdf")
+```
+
+```{r}
+suppressMessages(library(tidyverse))
+library(lubridate)
+library(patchwork)
+library(scales)
+library(showtext)
+library(ggdist)
+library(prismatic)
+``` 
+
+```{r}
+font_add_google(name = "Stylish", family = "stylish")
+showtext_opts(dpi = 300)
+showtext_auto(enable = TRUE)
+```
+
+
+```{r}
+yarn <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-10-11/yarn.csv')
+```
+
+```{r}
+pal <- c("#221738","#511466","#7a1a7a","#941a58","#3c7055","#078a52","#7ea334","#eb8b2a","#ebb30c")
+```
+
+``` {r}
+yarn_tbl <- yarn %>% 
+  filter(rating_count > 499) %>% 
+  filter(yarn_weight_name != "Thread") %>% 
+  select(yarn_weight_name, rating_average) %>% 
+  drop_na()
+
+yarn_summary <- yarn_tbl %>% 
+  group_by(yarn_weight_name) %>% 
+  summarise(med = median(rating_average),
+            mean= mean(rating_average),
+            min = min(rating_average)) %>% 
+  ungroup() %>% 
+  mutate(yarn_weighted_name = fct_reorder(yarn_weight_name, med),
+         name_num = as.numeric(yarn_weighted_name),
+         col = pal[name_num]) 
+  
+weight_factors <- yarn_summary %>% arrange(name_num) %>% pull(yarn_weight_name)
+
+ticks <- tibble(x = seq(3, 5, 0.5), y = 0.1)
+```
+
+``` {r}
+yarn_tbl %>%
+  mutate(yarn_weight_name = factor(yarn_weight_name, levels = weight_factors)) %>%
+  mutate(name_num = as.numeric(yarn_weight_name),
+         col = pal[name_num]) %>%
+  ggplot() +
+  stat_halfeye(
+    aes(
+      x = rating_average,
+      y = name_num,
+      colour = col,
+      fill = after_scale(clr_lighten(colour, 0.2))
+    ),
+    shape = 18,
+    point_size = 1.5,
+    interval_size = .3,
+    adjust = .5,
+    .width = c(0.66, 0.95)
+  ) +
+  geom_point(
+    data = yarn_summary,
+    aes(
+      x = med,
+      y = name_num,
+      colour = col,
+      colour = after_scale(clr_darken(colour, 0.5))
+    ),
+    shape = 18
+  ) +
+  geom_text(
+    data = yarn_summary,
+    aes(
+      x = min - 0.1,
+      y = name_num + 0.15,
+      label = yarn_weight_name
+    ),
+    colour = "#221738",
+    hjust = "right"
+  ) +
+  geom_text(
+    data = yarn_summary,
+    aes(
+      x = med,
+      y = name_num + 0.25,
+      label = number_format(accuracy = 0.01)(med)
+      ),
+      family = "stylish",
+      colour = clr_lighten("#221738", 0.8)
+  ) +
+  geom_segment(aes(
+    x = 3,
+    xend = 5,
+    y = 0,
+    yend = 0,
+    colour = "#221738"
+  )) +
+  geom_point(data = ticks,
+             aes(x, y),
+             shape = "|",
+             size = 2,
+             colour = "#221738") +
+  scale_x_continuous(limits = c(2.5, 5),
+                     breaks = seq(from = 3, to = 5, by = 0.5)) +
+  scale_colour_manual(values = pal) +
+  scale_fill_manual(values = pal) +
+  labs(
+    title = str_to_upper("Ratings for different yarn weight categories"),
+    subtitle = "500 or more ratings per category",
+    caption = "Data: ravelry.com",
+    x = NULL,
+    y = NULL
+  ) +
+  guides(colour = "none", fill = "none") +
+  theme_minimal() +
+  theme(
+    text = element_text(family = "stylish",
+                        colour = "#221738"),
+    plot.background = element_rect(fill = clr_lighten("#221738", space = "combined")),
+    plot.title = element_text(size = 26, 
+                              hjust = 0.5),
+    plot.subtitle = element_text(size = 18,
+                                 hjust = 0.5),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    axis.text.y = element_blank(),
+    axis.text.x = element_text(family = "stylish",
+                               colour = "#221738",
+                               size = 12)
+  )
+``` 
+
+```{r}
+ggsave(here::here("plots", yrwk, pdf_file),
+      width = 8, height = 7, dpi = 300,
+      device = cairo_pdf)
+
+ggsave(here::here("plots", yrwk, png_file),
+      width = 8, height = 7, dpi = 300,
+      device = "png")
+```
+
+
