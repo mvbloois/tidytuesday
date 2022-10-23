@@ -8,7 +8,7 @@ My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosyste
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-42_Stranger-Things-Dialogue.Rmd)
 
-![./plots/2022-42/2022-42_Stranger-Things-Dialogue.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/plots/2022-42/2022-42_Stranger-Things-Dialogue.png)
+![./plots/2022-42/2022-42_Stranger-Things-Dialogue.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/plots/2022-42/2022-42_Stranger-Things.png)
 
 
 ### [2022-41](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-41)Ravelry yarn by [ravelry.com](https://www.raverlry.com)
