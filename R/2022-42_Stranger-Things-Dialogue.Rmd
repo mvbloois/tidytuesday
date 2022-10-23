@@ -1,7 +1,7 @@
 ---
 title: "Stranger Things Dialogue"
 author: "Martijn van Bloois"
-date: "2022-10-18"
+date: "2022-10-23"
 output: html_document
 ---
 
@@ -30,7 +30,7 @@ library(prismatic)
 ``` 
 
 ```{r}
-font_add_google(name = "Stylish", family = "stylish")
+font_add_google(name = "Russo One", family = "russo")
 showtext_opts(dpi = 300)
 showtext_auto(enable = TRUE)
 ```
@@ -44,69 +44,63 @@ dialogues <- tuesdata$stranger_things_all_dialogue
 rm(tuesdata)
 ```
 
+
 ```{r}
 library(tidytext)
+afinn <- get_sentiments("afinn")
+
+orange <- "#f59705"
+green <- "#075437"
+background <- after_scale(clr_alpha(green, 0.2))
 
 dialogues_cleaned <- dialogues %>% 
   filter(!is.na(dialogue)) %>% 
   unnest_tokens(word, dialogue) %>% 
-  mutate(index = strftime((ceiling_date(as_datetime(start_time), unit = "5 minutes")), format = "%H:%M", tz = "GMT")) %>% 
-  mutate(se = glue::glue("S0{season}E0{episode}")) %>% 
-  count(se, index) 
-  
-dialogues_cleaned %>% 
-  ggplot(aes(x = index, y = n, group = se)) +
-  geom_line(aes(colour = se))
-
-
-```
-
-```{r}
-
-
-  
-dialogues_cleaned %>% 
-  count(word, sort = T)
-
-positive <- get_sentiments("bing") %>%
-  filter(sentiment == "positive")
-
-negative <- get_sentiments("bing") %>%
-  filter(sentiment == "negative")
-
-dialogues_cleaned %>%
-  semi_join(positive) %>%
-  count(word, sort = TRUE)
-
-dialogues_cleaned %>%
-  semi_join(negative) %>%
-  count(word, sort = TRUE)
-
-bing <- get_sentiments("bing")
-
-dialogues_cleaned %>% 
+  left_join(afinn) %>% 
+  mutate(value = ifelse(is.na(value), 0 , value)) %>% 
   group_by(season, episode) %>% 
-  summarise(start = min(start_time),
-            end = max(end_time))
+  mutate(sentiment = cumsum(value),
+         season = glue::glue("S0{season}")) 
 
-stranger_sentiments <- dialogues_cleaned %>%
-  inner_join(bing) %>%
-  count(season, episode, index = line %/% 10, sentiment) %>%
-  spread(sentiment, n, fill = 0) %>%
-  mutate(sentiment = positive - negative)
-
-stranger_sentiments
-
-stranger_sentiments %>% 
-  filter(season == 1) %>% 
-  ggplot(aes(index, sentiment, fill = episode)) +
-  geom_bar(stat = "identity", show.legend = FALSE) +
-  facet_wrap(~episode, ncol = 2)
+segments <- dialogues_cleaned %>% 
+  group_by(season, episode) %>% 
+  summarise(start_time = min(start_time),
+            end_time = max(end_time),
+            .groups = "drop")
 ```
 
-
 ```{r}
-pal <- c("#221738","#511466","#7a1a7a","#941a58","#3c7055","#078a52","#7ea334","#eb8b2a","#ebb30c")
+dialogues_cleaned %>% 
+  ggplot(aes(x = start_time, y = sentiment, group = episode)) +
+  geom_segment(data = segments,
+               aes(x = start_time, xend = end_time, y = 0, yend = 0),
+               size = 0.2,
+               colour = green) +
+  geom_line(colour = orange, size = .8) +
+  scale_fill_gradient2(low = "red", mid = "white", high = "blue") +
+  facet_grid(season ~ episode, scales = "free_x") +
+  labs(x = NULL, y = NULL,
+       title = "STRANGER THINGS",
+       subtitle = "Cummulative sentiment in the dialogue over each episode",
+       caption = "Source: 8flix.com prepared by Dan Fellowes & Jonathan Kitt") +
+  theme_minimal() +
+  theme(
+    text = element_text(family = "russo",
+                        colour = green),
+    axis.text = element_text(colour = green),
+    axis.text.x = element_blank(),
+    plot.title.position = "plot",
+    plot.title = element_text(size = 24,
+                              hjust = 0.5),
+    plot.subtitle = element_text(hjust = 0.5),
+    plot.background = element_rect(fill = background,
+                                   colour = background),
+    panel.grid = element_blank(),
+    strip.text.y = element_text(hjust = 0.3),
+    strip.text = element_text(colour = green)
+  )
+
+
 ```
 
 
@@ -116,7 +110,7 @@ ggsave(here::here("plots", yrwk, pdf_file),
       device = cairo_pdf)
 
 ggsave(here::here("plots", yrwk, png_file),
-      width = 8, height = 7, dpi = 300,
+      width = 8, height = 7, dpi = 300, bg = "white",
       device = "png")
 ```
 
