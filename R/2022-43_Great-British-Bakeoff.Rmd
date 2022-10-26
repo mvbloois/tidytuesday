@@ -119,11 +119,11 @@ ingredients %>%
 
 ```{r}
 ggsave(here::here("plots", yrwk, pdf_file),
-      width = 8, height = 8, dpi = 300,
+      width = 8, height = 9, dpi = 300,
       device = cairo_pdf)
 
 ggsave(here::here("plots", yrwk, png_file),
-      width = 8, height = 8, dpi = 300, bg = "white",
+      width = 8, height = 9, dpi = 300, bg = "white",
       device = "png")
 ```
 
