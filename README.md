@@ -4,7 +4,7 @@ My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosyste
 
 ***
 
-### [2022-43](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-43) Great British Bake Off by [https://bakeoff.netlify.app/](https://bakeoff.netlify.app/) - Alison Hill, Chester Ismay & Richard Iannone
+### [2022-43](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-43) Great British Bake Off by Alison Hill, Chester Ismay & Richard Iannone -  [https://bakeoff.netlify.app/]{bakeoff}) 
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-43_Great-British-Bakeoff.Rmd)
 
