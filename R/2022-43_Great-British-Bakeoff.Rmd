@@ -1,0 +1,130 @@
+---
+title: "Great British Bakeoff"
+author: "Martijn van Bloois"
+date: "2022-10-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+```
+
+```{r}
+topic <- "Great-British-Bakeoff"
+year <- 2022
+week <- 43
+yrwk <- glue::glue("{year}-{week}")
+plots_dir <- paste0(year, "-", week)
+fs::dir_create(here::here("plots", plots_dir))
+png_file <- glue::glue("{yrwk}_{topic}.png")
+pdf_file <- glue::glue("{yrwk}_{topic}.pdf")
+```
+
+```{r}
+suppressMessages(library(tidyverse))
+library(lubridate)
+library(showtext)
+library(tidytext)
+library(bakeoff)
+```
+
+```{r}
+font_add_google(name = "Oswald", family = "font")
+showtext_opts(dpi = 300)
+showtext_auto(enable = TRUE)
+```
+
+
+```{r}
+challenges <- bakeoff::challenges
+```
+
+```{r}
+remove <- c("cake", "biscuits", "buns", "loaf", "tart", "pies", "bread",
+           "meringue", "tarte", "tatin", "white", "chelsea", "drizzle",
+           "pie", "puddings", "roulade", "cupcakes")
+
+challenges %>% select(signature) %>% drop_na()
+
+ingredients <- challenges %>% 
+  select(signature) %>% 
+  drop_na() %>% 
+  unnest_tokens(word, signature) %>% 
+  anti_join(stop_words) %>% 
+  filter(!word %in% remove) %>% 
+  mutate(word = str_remove(word, "baklava"),
+         word = str_remove(word, "biscuits"),
+         word = str_remove(word, "bread"),
+         word = str_remove(word, "cupcakes"),
+         word = str_replace(word, "berries", "berry")
+         ) %>% 
+  mutate(word = case_when(word == "apples" ~ "apple",
+                          word == "almonds" ~ "almond",
+                          word == "apricots" ~ "apricot",
+                          word == "chocolat" ~ "chocolate",
+                          word == "chocolatey" ~ "chocolate",
+                          word == "citron" ~ "citrus",
+                          word == "spiced" ~ "spices",
+                          word == "spice" ~ "spices",
+                          word == "spicey" ~ "spices",
+                          word == "caramalised" ~ "caramel",
+                          word == "caramally" ~ "caramel",
+                          TRUE ~ word)
+         ) %>% 
+  count(word, sort = TRUE)
+```
+
+
+
+```{r, dpi=300, fig.width=8, fig.height=9}
+background <- "#c9b99f"
+col <- "#353858"
+
+ingredients %>% 
+  slice(1:10) %>% 
+  ggplot(aes(x = n, y = fct_reorder(word, n))) +
+  geom_col(fill = col) +
+  geom_text(aes(x = n-3, y = fct_reorder(word, n), label = n),
+            family = "font",
+            colour = background,
+            size = 5) +
+  labs(x = NULL, y = NULL,
+       title = str_to_upper("Signature favorites"),
+       subtitle = "most used ingredients in 703 signature challenges",
+       caption = "Source: bakeoff, data from \"The Great British Bake Off\"") +
+  theme_minimal() +
+  theme(
+    text = element_text(family = "font"),
+    plot.background = element_rect(fill = background),
+    plot.title.position = "plot",
+    plot.title = element_text(colour = col,
+                              size = 32,
+                              hjust = 0.5,
+                              margin=margin(0,0,-5,0)),
+    plot.subtitle = element_text(colour = col,
+                                 size = 16,
+                                 hjust = 0.5,
+                                 margin=margin(0,0,20,0)),
+    plot.caption = element_text(colour = col,
+                                size = 10),
+    plot.margin = margin(1, 1, 1, 1, "cm"),
+    axis.text = element_text(colour = col,
+                             size = 18),
+    axis.text.y = element_text(vjust = 0.4),
+    axis.text.x = element_blank(),
+    panel.grid = element_blank()
+  )
+```
+
+
+```{r}
+ggsave(here::here("plots", yrwk, pdf_file),
+      width = 8, height = 8, dpi = 300,
+      device = cairo_pdf)
+
+ggsave(here::here("plots", yrwk, png_file),
+      width = 8, height = 8, dpi = 300, bg = "white",
+      device = "png")
+```
+
+
