@@ -1,0 +1,116 @@
+---
+title: "Horror Movies"
+author: "Martijn van Bloois"
+date: "2022-11-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+```
+
+```{r}
+topic <- "Horror-Movies"
+year <- 2022
+week <- 44
+yrwk <- glue::glue("{year}-{week}")
+plots_dir <- paste0(year, "-", week)
+fs::dir_create(here::here("plots", plots_dir))
+png_file <- glue::glue("{yrwk}_{topic}.png")
+pdf_file <- glue::glue("{yrwk}_{topic}.pdf")
+```
+
+```{r}
+suppressMessages(library(tidyverse))
+library(scales)
+library(lubridate)
+library(showtext)
+library(ggimage)
+```
+
+```{r}
+font_add_google(name = "Creepster", family = "font")
+font_add_google(name = "Poor Story", family = "korean")
+showtext_opts(dpi = 300)
+showtext_auto(enable = TRUE)
+```
+
+
+```{r}
+base_url <- "https://www.themoviedb.org/t/p/w1280/"
+
+horror_movies <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-11-01/horror_movies.csv')
+```
+
+```{r}
+top_10 <- horror_movies %>% 
+  filter(vote_count > 99) %>% 
+  filter(runtime > 59) %>% 
+  arrange(desc(vote_average)) %>% 
+  mutate(rank = row_number(),
+         poster = paste0(base_url, poster_path)) %>% 
+  head(10)
+```
+
+
+
+```{r, dpi=300, fig.width=5, fig.height=4}
+bloodred <- "#8A0707"
+black <- "black"
+
+top_10 %>% 
+  mutate(original_title = ifelse(rank == 3, "Scooby-Doo!", original_title)) %>% 
+  ggplot(aes(x = rev(rank), y = vote_average)) +
+  geom_col(fill = bloodred, width = 0.7) +
+  geom_text(aes(x = rev(rank) + 0.2, y = -4, label = original_title),
+            family = ifelse(top_10$original_language == "ko", "korean", "font"),
+            colour = bloodred,
+            size = 14,
+            hjust = "right") +
+  geom_text(aes(x = rev(rank) - 0.2, y = -4, label = year(release_date)),
+            family = "font",
+            colour = bloodred,
+            size = 7,
+            hjust = "right") +
+  geom_text(aes(y = vote_average - 0.5,
+                label = number_format(accuracy = 0.1)(vote_average)),
+            family = "font",
+            colour = black,
+            size = 14,
+            hjust = "right") +
+  geom_image(mapping=aes(y = -2, image = poster))+
+  scale_y_continuous(limits = c(-20,9)) +
+  coord_flip() +
+  labs(title = "Top Ten Highest rated horror movies",
+       subtitle = "Movies running more than 60 minutes and having received more than 100 votes",
+       caption = "Data: The Movie Database",
+       x = NULL,
+       y = NULL) +
+  theme_minimal() +
+  theme(
+    text = element_text(colour = bloodred),
+    plot.title.position = "plot",
+    plot.title = element_text(family = "font",
+                              size = 42,
+                              hjust = 0.5),
+    plot.subtitle = element_text(size = 22,
+                              hjust = 0.5),
+    plot.caption = element_text(size = 14),
+    plot.background = element_rect(fill = black, colour = black),
+    axis.text.x = element_blank(),
+    axis.text.y = element_blank(),
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank()
+  )
+```
+
+
+```{r}
+ggsave(here::here("plots", yrwk, png_file),
+      width = 6, height = 5, dpi = 300, bg = "white",
+      device = "png")
+```
+
+
