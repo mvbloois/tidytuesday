@@ -4,6 +4,12 @@ My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosyste
 
 ***
 
+### [2022-44](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-44) Horror Movies by [The Movie Database](https://www.themoviedb.org/) 
+
+[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-44_Horror-Movies.Rmd)
+
+![./plots/2022-44/2022-44_Horror-Movies.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/plots/2022-44/2022-44_Horror-Movies.png)
+
 ### [2022-43](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-43) Great British Bake Off by Alison Hill, Chester Ismay & Richard Iannone -  [{bakeoff}](https://bakeoff.netlify.app/) 
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-43_Great-British-Bakeoff.Rmd)
