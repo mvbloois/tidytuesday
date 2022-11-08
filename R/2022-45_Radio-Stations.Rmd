@@ -1,0 +1,53 @@
+---
+title: "Radio Stations"
+author: "Martijn van Bloois"
+date: "2022-11-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+```
+
+```{r}
+topic <- "Radio-Stations"
+year <- 2022
+week <- 45
+yrwk <- glue::glue("{year}-{week}")
+plots_dir <- paste0(year, "-", week)
+fs::dir_create(here::here("plots", plots_dir))
+png_file <- glue::glue("{yrwk}_{topic}.png")
+pdf_file <- glue::glue("{yrwk}_{topic}.pdf")
+```
+
+```{r}
+suppressMessages(library(tidyverse))
+library(scales)
+library(lubridate)
+library(showtext)
+library(ggimage)
+```
+
+```{r}
+font_add_google(name = "Creepster", family = "font")
+font_add_google(name = "Poor Story", family = "korean")
+showtext_opts(dpi = 300)
+showtext_auto(enable = TRUE)
+```
+
+
+```{r}
+tuesdata <- tidytuesdayR::tt_load(2022, week = 45)
+
+state_stations <- tuesdata$state_stations
+```
+
+
+
+```{r}
+ggsave(here::here("plots", yrwk, png_file),
+      width = 6, height = 5, dpi = 300, bg = "white",
+      device = "png")
+```
+
+
