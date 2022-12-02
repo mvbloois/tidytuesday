@@ -1,0 +1,106 @@
+---
+title: "World Cup"
+author: "Martijn van Bloois"
+date: "2022-12-02"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+```
+
+```{r}
+topic <- "World-Cup"
+year <- 2022
+week <- 48
+yrwk <- glue::glue("{year}-{week}")
+plots_dir <- paste0(year, "-", week)
+fs::dir_create(here::here("plots", plots_dir))
+png_file <- glue::glue("{yrwk}_{topic}.png")
+pdf_file <- glue::glue("{yrwk}_{topic}.pdf")
+```
+
+```{r}
+suppressMessages(library(tidyverse))
+library(ggtext)
+library(showtext)
+library(emo)
+```
+
+```{r}
+#devtools::install_github("hadley/emo")
+
+#font_add_google(name = "Zen Dots", family = "font")
+#showtext_opts(dpi = 300)
+#showtext_auto(enable = TRUE)
+```
+
+
+```{r}
+worldcups <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-11-29/worldcups.csv')
+```
+
+```{r}
+df <- worldcups %>% 
+  select(winner:fourth) %>% 
+  pivot_longer(cols = winner:fourth, names_to = "place", values_to = "country") %>% 
+  mutate(country = case_when(str_detect(country, "Germany") ~ "(West-) Germany",
+                             TRUE ~ country)) %>% 
+  dplyr::group_by(country, place) %>%
+  dplyr::summarise(n = dplyr::n(), .groups = "drop") 
+
+country_order <- df %>%
+  pivot_wider(id_cols = country, names_from = place, values_from = n, values_fill = 0) %>% 
+  select(country, winner, second, third, fourth) %>% 
+  arrange(desc(winner), desc(second),desc(third),desc(fourth)) %>% pull(country)
+
+place_order <- rev(c("winner", "second", "third", "fourth"))
+
+col_pal <- c("winner" = "#ffd700",
+             "second" = "#C0C0C0",
+             "third" = "#cd7f32",
+             "fourth" = "#B87333")
+
+grass <- "#348C31"
+```
+
+```{r, fig.height=8, fig.width=5}
+df %>% 
+  ggplot(aes(x = n, y = fct_rev(fct_relevel(country, country_order)), fill = fct_relevel(place, place_order))) +
+  geom_col(colour = "white", linewidth = 0.1) +
+  geom_label(aes(x = 8, y = "Netherlands", label = "Most finals without winning a World Cup final"),
+             size = 2.5,
+             fill = "white", colour = "darkgreen", nudge_y = -0.5) +
+  geom_label(aes(x = 8.1, y = "Uruguay", label = "Only country with a small population to win a final"),
+             size = 2.5,
+             fill = "white", colour = "darkgreen", nudge_y = -0.5) +
+  scale_x_continuous(breaks = 0.5:13.5, labels = 1:14, sec.axis = dup_axis()) +
+  scale_fill_manual(name = "place", values = col_pal) +
+  guides(fill = guide_legend(reverse=TRUE)) +
+  labs(x = NULL, y = NULL,
+       title = str_to_upper("Can I kick it?"),
+       subtitle = glue::glue("Countries finishing top-4 in the World Cup {emo::ji('soccer')} 1930-2018"),
+       caption = "Data: Kaggle FIFA World Cup") +
+  theme_minimal() +
+  theme(
+    text = element_text(family = "font", colour = "white"),
+    axis.text = element_text(family = "font", colour = "white"),
+    panel.background = element_rect(fill = grass, colour = grass),
+    plot.background =  element_rect(fill = grass, colour = grass),
+    plot.title.position = "plot",
+    plot.title = element_text(hjust = 0.5),
+    plot.subtitle = element_markdown(hjust = 0.5),
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.x = element_blank(),
+    legend.position = "bottom"
+  )
+```
+
+
+```{r}
+ggsave(here::here("plots", yrwk, png_file),
+      width = 5, height = 8, dpi = 300, bg = "black",
+      device = "png")
+```
+
+
