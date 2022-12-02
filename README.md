@@ -4,6 +4,12 @@ My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosyste
 
 ***
 
+### [2022-48](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-48) World Cup by [Kaggle](https://www.kaggle.com/datasets/evangower/fifa-world-cup) 
+
+[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-48_World-Cup.Rmd)
+
+![./plots/2022-48/2022-48_World-Cup.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/plots/2022-48/2022-48_World-Cup.png)
+
 ### [2022-45](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-45) Radio Stations by [FCC.gov](https://www.fcc.gov/media/radio/fm-service-contour-data-points) 
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-45_Radio-Stations.Rmd)
