@@ -4,6 +4,15 @@ My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosyste
 
 ***
 
+### [2022-50](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-50) Monthly State Retail Sales by [US Census](https://www.census.gov/retail/state_retail_sales.html) 
+
+[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-50_Monthly-State-Retail-Sales.Rmd)
+
+![./plots/2022-50/2022-50_Monthly-State-Retail-Sales.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/plots/2022-50/2022-50_Monthly-State-Retail-Sales.png)
+
+
+***
+
 ### [2022-48](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-48) World Cup by [Kaggle](https://www.kaggle.com/datasets/evangower/fifa-world-cup) 
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-48_World-Cup.Rmd)
