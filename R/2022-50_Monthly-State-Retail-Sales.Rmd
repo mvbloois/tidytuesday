@@ -1,0 +1,96 @@
+---
+title: "Monthly State Retail Sales"
+author: "Martijn van Bloois"
+date: "2022-12-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+```
+
+```{r}
+topic <- "Monthly-State-Retail-Sales"
+year <- 2022
+week <- 50
+yrwk <- glue::glue("{year}-{week}")
+plots_dir <- paste0(year, "-", week)
+fs::dir_create(here::here("plots", plots_dir))
+png_file <- glue::glue("{yrwk}_{topic}.png")
+pdf_file <- glue::glue("{yrwk}_{topic}.pdf")
+```
+
+```{r}
+suppressMessages(library(tidyverse))
+library(lubridate)
+library(ggtext)
+library(showtext)
+```
+
+```{r}
+font_add_google(name = "Rhodium Libre", family = "font")
+showtext_opts(dpi = 300)
+showtext_auto(enable = TRUE)
+```
+
+
+```{r}
+state_retail <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2022/2022-12-13/state_retail.csv',  col_types = "cciciiccc") %>% 
+  mutate(month = ymd(paste(year, month , "1", sep = "-")),
+         change_yoy = as.numeric(change_yoy))
+```
+
+```{r}
+sectors <- state_retail %>% distinct(subsector) %>% pull()
+
+red <- "#fa7f29"
+blue <- "#41acec"
+bg <- "#f9c49e"
+brown <- "#903e1c"
+black <- "#59130b"
+
+state_retail %>% 
+  filter(state_abbr == "CO") %>% 
+  filter(subsector %in% c("Food and Beverage",
+                          "Gasoline Stations",
+                          "Health and Personal Care")
+         ) %>%
+  ggplot(aes(x = month, y = change_yoy, group = state_abbr)) +
+  geom_col(fill = red,
+            colour = brown) +
+  geom_hline(yintercept = 0, colour = brown) +
+  scale_y_continuous(labels = scales::number_format(suffix = "%")) +
+  labs(title = "Monthly Retail Sales: Colorado",
+       subtitle = str_wrap("The Monthly State Retail Sales (MSRS) is the Census Bureau's new experimental data product featuring modeled state-level retail sales. Different retail sectors were 
+affected differently by Covid-19.", 80),
+       x = "",
+       y = "Change in retail sales (YoY)",
+       caption = "Source: US Census Bureau; Monthly State Retail Sales") +
+  facet_wrap(~subsector) +
+  theme_minimal() +
+  theme(
+    text = element_text(family = "font",
+                        colour = black),
+    axis.text = element_text(colour = black),
+    axis.text.x.bottom = element_text(hjust = -0.45),
+    strip.text = element_text(colour = black),
+    plot.title.position = "plot",
+    plot.title = element_text(face = "bold", size = 24),
+    plot.background = element_rect(fill = bg),
+    panel.grid.major.y = element_line(size = 0.2),
+    panel.grid.minor.y = element_blank(),
+    #panel.grid.major.x = element_blank(),
+    panel.grid.minor.x = element_blank()
+    )
+
+```
+
+
+
+```{r}
+ggsave(here::here("plots", yrwk, png_file),
+      width = 8, height = 7, dpi = 300, bg = "black",
+      device = "png")
+```
+
+
