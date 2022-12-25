@@ -1,0 +1,108 @@
+---
+title: "Weather Forecast Accuracy"
+author: "Martijn van Bloois"
+date: "2022-12-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE)
+```
+
+```{r}
+topic <- "Weather Forecast Accuracy"
+year <- 2022
+week <- 51
+yrwk <- glue::glue("{year}-{week}")
+plots_dir <- paste0(year, "-", week)
+fs::dir_create(here::here("plots", plots_dir))
+png_file <- glue::glue("{yrwk}_{topic}.png")
+pdf_file <- glue::glue("{yrwk}_{topic}.pdf")
+```
+
+```{r}
+suppressMessages(library(tidyverse))
+library(lubridate)
+library(PrettyCols)
+library(usmap)
+library(patchwork)
+library(showtext)
+```
+
+```{r}
+font_add_google(name = "Montserrat", family = "font")
+showtext_opts(dpi = 300)
+showtext_auto(enable = TRUE)
+```
+
+
+```{r}
+tuesdata <- tidytuesdayR::tt_load(2022, week = 51)
+
+weather_forecasts <- tuesdata$weather_forecasts
+cities <- tuesdata$cities
+outlook_meanings <- tuesdata$outlook_meanings
+```
+
+```{r}
+way_off <- weather_forecasts %>% 
+  filter(forecast_hours_before == 12) %>% 
+  select(date, city,state, high_or_low, forecast_temp, observed_temp) %>% 
+  mutate(error =  observed_temp - forecast_temp) %>% 
+  filter(abs(error) >= 10) %>% 
+  count(city, state)
+
+us <- map_data("state")
+kcc <- c("A" = "Tropical", "B" = "Arid", "C" = "Temperate", "D" = "Continental")
+
+df <- cities %>% 
+  left_join(way_off, by = c("city", "state")) %>% 
+  replace_na(list(n = 0)) %>% 
+  filter(!state %in% c("AK", "HI", "PR", "VI")) %>% 
+  mutate(binned = cut(n, c(-1, 1, 10,20,30,40,50,60)),
+         koppen = str_sub(koppen, 1, 1),
+         koppen = kcc[koppen])
+```
+
+``` {r}
+map <- df %>% 
+  ggplot() +
+  geom_map(data=us, map=us,
+                    aes(x=long, y=lat, map_id=region),
+                    fill="#ffffff", color="#123456", size=0.15) +
+  geom_point(aes(x = lon, y = lat, colour = koppen, size = n, alpha = n)) +
+  scale_colour_pretty_d("Bold") +
+  scale_alpha_continuous(range = c(0.5, 1)) +
+  coord_map("albers", lat0 = 39, lat1 = 45,
+            xlim = c(-119.22,-75.8)) +
+  guides(colour = guide_legend("Köppen Climate"),
+         size = guide_legend("# major forecast errors"),
+         alpha = guide_legend("# major forecast errors")) +
+  theme_void() +
+  theme(
+    text = element_text(family = "font"),
+    legend.position = "right"
+  )
+```
+
+
+```{r}
+map +
+  plot_annotation(title = str_to_upper("Temperature Surprises"),
+                   subtitle = str_wrap("The number of times the high or low temperature forecast (12 hours) was off by 10 degrees Fahrenheit or more between January 30th, 2021 and June 1st, 2022. Helena (MT) has by far the most temperature surprises in the continental USA.", 80),
+       caption = "Data: Weather Forecast Capstone Project") &
+  theme(
+    text = element_text(family = "font"),
+    plot.title = element_text(hjust = 0.5, vjust = 1.5),
+    plot.caption = element_text(vjust = -1.8)
+    )
+```
+
+
+```{r}
+ggsave(here::here("plots", yrwk, png_file),
+      width = 7, height = 5, dpi = 300, bg = "white",
+      device = "png")
+```
+
+
