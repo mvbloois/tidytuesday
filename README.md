@@ -4,6 +4,14 @@ My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosyste
 
 ***
 
+### [2022-51](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-51) Weather Forecast Accuracy by [Weather Forecast Capstone Project](https://github.com/speegled/weather_forecasts) 
+
+[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-51_Weather-Forecast-Accuracy.Rmd)
+
+![./plots/2022-51/2022-51_Weather-Forecast-Accuracy.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/plots/2022-51/2022-51_Weather-Forecast-Accuracy.png)
+
+***
+
 ### [2022-50](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-50) Monthly State Retail Sales by [US Census](https://www.census.gov/retail/state_retail_sales.html) 
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-50_Monthly-State-Retail-Sales.Rmd)
