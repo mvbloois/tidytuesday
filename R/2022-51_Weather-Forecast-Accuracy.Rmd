@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE)
 ```
 
 ```{r}
-topic <- "Weather Forecast Accuracy"
+topic <- "Weather-Forecast-Accuracy"
 year <- 2022
 week <- 51
 yrwk <- glue::glue("{year}-{week}")
