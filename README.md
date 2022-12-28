@@ -4,6 +4,14 @@ My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosyste
 
 ***
 
+### [2022-52](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-52) Star Trek Timelines by [Matthew Leonawicz](https://leonawicz.github.io/rtrek/) 
+
+[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-52_rtrek.R)
+
+![./plots/2022-52/2022-52_rtrek.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/plots/2022-52/2022-52_rtrek.png)
+
+***
+
 ### [2022-51](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-51) Weather Forecast Accuracy by [Weather Forecast Capstone Project](https://github.com/speegled/weather_forecasts) 
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-51_Weather-Forecast-Accuracy.Rmd)
