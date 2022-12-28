@@ -8,7 +8,7 @@ My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosyste
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-52_rtrek.R)
 
-![./plots/2022-52/2022-52_rtrek.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/plots/2022-52/2022-52_rtrek.png)
+![./plots/2022-52/2022-52_rtrek.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/plots/2022-52/rtrek.png)
 
 ***
 
