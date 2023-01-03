@@ -4,6 +4,15 @@ My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosyste
 
 ***
 
+### [2023-01](https://github.com/mvbloois/tidytuesday/tree/main/2023/2023-01) Bring Your Own Data by [Wikipedia](https://en.wikipedia.org/wiki/Marathon_world_record_progression) 
+
+[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/2023/2023-01/bring-your-own.R)
+
+![./2023/2023-01/bring-your-own.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/2023/2023-01/bring-your-own.png)
+
+
+***
+
 ### [2022-52](https://github.com/mvbloois/tidytuesday/tree/main/plots/2022-52) Star Trek Timelines by [Matthew Leonawicz](https://leonawicz.github.io/rtrek/) 
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/R/2022-52_rtrek.R)
