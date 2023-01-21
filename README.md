@@ -4,7 +4,7 @@ My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosyste
 
 ***
 
-### [2023-03](https://github.com/mvbloois/tidytuesday/tree/main/2023/2023-03) Art History by [Wikipedia](https://en.wikipedia.org/wiki/Marathon_world_record_progression) 
+### [2023-03](https://github.com/mvbloois/tidytuesday/tree/main/2023/2023-03) Art History by [Sara Lemus & Holland Stam](https://saralemus7.github.io/arthistory/)
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/2023/2023-03/art-history.R)
 
