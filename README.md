@@ -4,12 +4,19 @@ My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosyste
 
 ***
 
+### [2023-03](https://github.com/mvbloois/tidytuesday/tree/main/2023/2023-03) Art History by [Wikipedia](https://en.wikipedia.org/wiki/Marathon_world_record_progression) 
+
+[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/2023/2023-03/art-history.R)
+
+![./2023/2023-03/art-history.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/2023/2023-03/art-history.png)
+
+***
+
 ### [2023-01](https://github.com/mvbloois/tidytuesday/tree/main/2023/2023-01) Bring Your Own Data by [Wikipedia](https://en.wikipedia.org/wiki/Marathon_world_record_progression) 
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/2023/2023-01/bring-your-own.R)
 
 ![./2023/2023-01/bring-your-own.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/2023/2023-01/bring-your-own.png)
-
 
 ***
 
