@@ -6,7 +6,7 @@ My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosyste
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/2023/2023-04/alone.R)
 
-![./2023/2023-04/alone.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/2023/2023-004/alone.png)
+![./2023/2023-04/alone.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/2023/2023-04/alone.png)
 
 ***
 
