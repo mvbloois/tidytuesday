@@ -4,9 +4,9 @@ My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosyste
 
 ### [2023-04](https://github.com/mvbloois/tidytuesday/tree/main/2023/2023-04) Alone by [Dan Oehm](https://github.com/doehm/alone)
 
-[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/2023/2023-04/alne.R)
+[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/2023/2023-04/alone.R)
 
-![./2023/2023-04/alne.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/2023/2023-004/alne.png)
+![./2023/2023-04/alone.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/2023/2023-004/alone.png)
 
 ***
 
