@@ -2,6 +2,14 @@
 
 My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosystem. 
 
+### [2023-07](https://github.com/mvbloois/tidytuesday/tree/main/2023/2023-07) Hollywood Age Gap by [Data Is Plural](https://hollywoodagegap.com/)
+
+[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/2023/2023-07/hollywood-age-gap.R)
+
+![./2023/2023-07/hollywood-age-gap.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/2023/2023-07/hollywood-age-gap.png)
+
+***
+
 ### [2023-06](https://github.com/mvbloois/tidytuesday/tree/main/2023/2023-06) Big Tech Stock Prices by [Kaggle](https://www.kaggle.com/datasets/evangower/big-tech-stock-prices)
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/2023/2023-06/big-tech-stock-prices.R)
