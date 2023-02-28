@@ -2,6 +2,12 @@
 
 My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosystem. 
 
+### [2023-09](https://github.com/mvbloois/tidytuesday/tree/main/2023/2023-09) African Language Sentiment by [AfriSenti](https://github.com/afrisenti-semeval/afrisent-semeval-2023)
+
+[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/2023/2023-09/african-language-sentiment.R)
+
+![./2023/2023-09/african-language-sentiment.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/2023/2023-09/african-language-sentiment.png)
+
 ### [2023-08](https://github.com/mvbloois/tidytuesday/tree/main/2023/2023-08) Bob Ross by [Jared Wilber](https://github.com/jwilber/Bob_Ross_Paintings)
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/2023/2023-08/bob-ross-paintings.R)
