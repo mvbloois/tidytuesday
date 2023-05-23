@@ -39,7 +39,7 @@ df %>%
     x = NULL,
     y = NULL,
     title = "Of mice and rats",
-    subtitle = str_wrap("The Portal Project is a long-term ecological study being conducted near Portal, AZ. Since 1977, the site has been used to study the interactions among rodents, ants and plants and their respective responses to climate. To study the interactions among organisms, they experimentally manipulate access to 24 study plots.", 85),
+    subtitle = "The Portal Project is a long-term ecological study being conducted near Portal, AZ.\nSince 1977, the site has been used to study the interactions among rodents, ants and\n plants and their respective responses to climate.\n\nThis chart looks at observations of species through the years.",
     caption = "Data: Portal Project"
   ) +
   guides(
