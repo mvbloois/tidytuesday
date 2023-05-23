@@ -2,6 +2,12 @@
 
 My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosystem. 
 
+### [2023-21](https://github.com/mvbloois/tidytuesday/tree/main/2023/2023-21) [Squirrel Census](https://www.thesquirrelcensus.com)
+
+[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/2023/2023-21/central-park-squirrels.R)
+
+![./2023/2023-21/central-park-squirrels.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/2023/2023-21/central-park-squirrels.png)
+
 ### [2023-18](https://github.com/mvbloois/tidytuesday/tree/main/2023/2023-18) [Portal Project](https://portal.weecology.org/)
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/2023/2023-18/portal-project.R)
