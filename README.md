@@ -2,6 +2,12 @@
 
 My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosystem. 
 
+### [2023-22](https://github.com/mvbloois/tidytuesday/tree/main/2023/2023-22) [Verified Oldest People](https://github.com/frankiethull/centenarians)
+
+[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/2023/2023-22/verified-oldest-people.R)
+
+![./2023/2023-22/verified-oldest-people.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/2023/2023-22/verified-oldest-people.png)
+
 ### [2023-21](https://github.com/mvbloois/tidytuesday/tree/main/2023/2023-21) [Squirrel Census](https://www.thesquirrelcensus.com)
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/2023/2023-21/central-park-squirrels.R)
