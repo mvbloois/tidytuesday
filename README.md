@@ -2,6 +2,12 @@
 
 My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosystem. 
 
+### [2023-24](https://github.com/mvbloois/tidytuesday/tree/main/2023/2023-24) [UFO Sightings Redux](https://nuforc.org/webreports/ndxshape.html)
+
+[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/2023/2023-24/ufo-sightings-redux.R)
+
+![./2023/2023-24/ufo-sightings-redux.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/2023/2023-24/ufo-sightings-redux.png)
+
 ### [2023-22](https://github.com/mvbloois/tidytuesday/tree/main/2023/2023-22) [Verified Oldest People](https://github.com/frankiethull/centenarians)
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/2023/2023-22/verified-oldest-people.R)
