@@ -50,7 +50,7 @@ plot_data %>%
   scale_fill_manual(values = hexes) +
   labs(x = "number of mentions", y = NULL,
        title = "What colours are most mentioned in UFO sightings?",
-       subtitle = str_wrap("The National UFO Reporting Center maintains a collection of UFO sightings. This chart looks at the colours mentioned in the summary of the almost 100,000 events.", 80),
+       subtitle = str_wrap("The National UFO Reporting Center maintains a collection of UFO sightings. This chart looks at the colours mentioned in the summary of almost 100,000 events.", 80),
        caption = "Data: National UFO Reporting Center") +
   guides(fill = "none") +
   theme_minimal() +
