@@ -2,11 +2,17 @@
 
 My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosystem. 
 
+### [2024-02-06](https://github.com/mvbloois/tidytuesday/tree/main/2024/2024-02-06) [UNESCO World Heritage Sites](https://whc.unesco.org/en/list)
+
+[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/2024/2024-02-06/2024-02-06.R)
+
+![./2024/2024-02-06/2024-02-06.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/2024/2024-02-06/2024-02-06.png)
+
 ### [2023-36](https://github.com/mvbloois/tidytuesday/tree/main/2023/2023-63) [Union Membership](https://www.unionstats.com/)
 
-[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/2023/2023-36/union-members.R)
+[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/2023/2023-36/union-membership.R)
 
-![./2023/2023-36/union-members.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/2023/2023-36/union-members.png)
+![./2023/2023-36/union-membership.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/2023/2023-36/union-membership.png)
 
 ### [2023-25](https://github.com/mvbloois/tidytuesday/tree/main/2023/2023-27) [Historical Markers](https://www.hmdb.org/geolists.asp?c=United%20States%20of%20America)
 
