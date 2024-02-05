@@ -205,8 +205,8 @@ long %>%
   geom_text(aes(label = year),
             colour = "white",
             family = "font") +
-  geom_text(aes(x = n + 0.55, y = n - 0.55, label = n),
-            size = 5,
+  geom_text(aes(x = n + 0.6, y = n - 0.6, label = n),
+            size = 6,
             colour = "grey40",
             family = "font") +
   geom_point(
