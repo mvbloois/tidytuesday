@@ -2,6 +2,12 @@
 
 My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosystem. 
 
+### [2024-02-20](https://github.com/mvbloois/tidytuesday/tree/main/2024/2024-02-20) [R Consortium Infrastructure Steering Committee](https://www.r-consortium.org/all-projects/awarded-projects)
+
+[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/2024/2024-02-20/2024-02-20.R)
+
+![./2024/2024-02-20/2024-02-20.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/2024/2024-02-20/2024-02-20.png)
+
 ### [2024-02-06](https://github.com/mvbloois/tidytuesday/tree/main/2024/2024-02-06) [UNESCO World Heritage Sites](https://whc.unesco.org/en/list)
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/2024/2024-02-06/2024-02-06.R)
