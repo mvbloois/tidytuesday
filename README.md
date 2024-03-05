@@ -2,6 +2,12 @@
 
 My contributions to `TidyTuesday`, a weekly data project aimed at the R ecosystem. 
 
+### [2024-03-05](https://github.com/mvbloois/tidytuesday/tree/main/2024/2024-03-05) [Mr Trash Wheel](https://www.mrtrashwheel.com/)
+
+[Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/2024/2024-03-05/2024-03-05.R)
+
+![./2024/2024-03-05/2024-03-05.png](https://raw.githubusercontent.com/mvbloois/tidytuesday/main/2024/2024-03-05/2024-03-05.png)
+
 ### [2024-02-27](https://github.com/mvbloois/tidytuesday/tree/main/2024/2024-02-27) [Leap Days](https://en.wikipedia.org/wiki/February_29)
 
 [Code](https://htmlpreview.github.io/?https://github.com/mvbloois/tidytuesday/blob/main/2024/2024-02-27/2024-02-27.R)
